@@ -1,0 +1,23 @@
+[package]
+name = "turbo"
+version = "0.1.0"
+edition = "2021"
+description="Rust compilations, made faster"
+authors=[
+    "dimensionhq <team@dimension.dev>"
+]
+license="Apache 2.0"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "3.1.8", features = [
+  "derive",
+  "cargo",
+  "std",
+  "color",
+], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+toml="0.5.8"
+uuid = { version = "0.8", features = ["serde", "v4"] }
+ansi_term = "0.12"
+dirs = "4.0.0"
