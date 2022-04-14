@@ -15,9 +15,9 @@ pub fn add_rustc_wrapper(path: &str, sccache_path: &str) {
 
         let mut t_contents_clone = t_contents.clone();
         t_contents_clone.insert(String::from("build"), Value::Table(map));
-        let mut t_contents_inverted: Map<String, Value> = Map::new();
 
-        let mut toml_value = toml::Value::Table(t_contents_inverted);
+        let toml_value = toml::Value::Table(t_contents_clone);
+
         let toml_string = toml_value.to_string();
         std::fs::write(path, toml_string).unwrap();
     }

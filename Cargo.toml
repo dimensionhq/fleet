@@ -17,7 +17,7 @@ clap = { version = "3.1.8", features = [
   "color",
 ], default-features = false }
 serde = { version = "1.0", features = ["derive"] }
-toml="0.5.8"
+toml={version="0.5.8", features=["preserve_order"]}
 uuid = { version = "0.8", features = ["serde", "v4"] }
 ansi_term = "0.12"
 dirs = "4.0.0"
