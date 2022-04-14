@@ -50,8 +50,15 @@ pub fn init(app: crate::cli::app::App) {
         }
     }
 
-    let cargo_toml = std::env::current_dir().unwrap().join("Cargo.toml");
+    // https://doc.rust-lang.org/cargo/reference/config.html
+    let cargo_manifest_dir = std::env::current_dir().unwrap().join(".cargo");
 
+    std::fs::create_dir_all(cargo_manifest_dir.clone()).unwrap();
+
+    let cargo_toml = cargo_manifest_dir.join("config.toml");
+    if !cargo_toml.exists() {
+        std::fs::File::create(cargo_toml.clone());
+    }
     add_rustc_wrapper(
         cargo_toml.to_str().unwrap(),
         &config.build.sccache.to_str().unwrap(),

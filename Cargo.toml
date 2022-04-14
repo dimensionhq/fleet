@@ -2,25 +2,27 @@
 name = "turbo"
 version = "0.1.0"
 edition = "2021"
-description="Rust compilations, made faster"
-authors=[
-    "dimensionhq <team@dimension.dev>"
-]
-license="Apache 2.0"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Rust compilations, made faster"
+authors = ["dimensionhq <team@dimension.dev>"]
+license = "Apache 2.0"
 
 [dependencies]
-clap = { version = "3.1.8", features = [
-  "derive",
-  "cargo",
-  "std",
-  "color",
-], default-features = false }
-serde = { version = "1.0", features = ["derive"] }
-toml={version="0.5.8", features=["preserve_order"]}
-uuid = { version = "0.8", features = ["serde", "v4"] }
 ansi_term = "0.12"
 dirs = "4.0.0"
 
-[build]
-rustc-wrapper = "/home/varunp/.cargo/bin/sccache"
+[dependencies.clap]
+version = "3.1.8"
+features = ["derive", "cargo", "std", "color"]
+default-features = false
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.toml]
+version = "0.5.8"
+features = ["preserve_order"]
+
+[dependencies.uuid]
+version = "0.8"
+features = ["serde", "v4"]
