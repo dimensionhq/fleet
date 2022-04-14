@@ -1,9 +1,9 @@
-use cli::cli::CLI;
+use cli::CLI;
 
 pub mod cli;
 pub mod commands;
 pub mod config;
 
 fn main() {
-    let cli = CLI::run();
+    let _cli = CLI::run();
 }

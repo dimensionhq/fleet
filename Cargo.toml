@@ -21,3 +21,6 @@ toml="0.5.8"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 ansi_term = "0.12"
 dirs = "4.0.0"
+
+[build]
+rustc-wrapper = "/home/varunp/.cargo/bin/sccache"

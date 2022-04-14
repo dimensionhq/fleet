@@ -46,7 +46,7 @@ impl TurboConfig {
 
             if let Ok(mut config) = config {
                 self.update_sccache(&mut config, sccache_path);
-                return config;
+                config
             } else {
                 println!("Invalid turbo config");
                 exit(1)
@@ -61,7 +61,7 @@ impl TurboConfig {
             };
             let config_file = toml::to_string(&config).unwrap();
             std::fs::write(config_path, config_file).unwrap();
-            return config;
+            config
         }
     }
 
@@ -79,9 +79,9 @@ impl TurboConfig {
             let config_file = toml::to_string(&config).unwrap();
             std::fs::write(config_path, config_file).unwrap();
 
-            return config.clone();
+            config.clone()
         } else {
-            return config.clone();
+            config.clone()
         }
     }
 }
