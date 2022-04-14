@@ -1,0 +1,5 @@
+turbo = true
+turbo_id = "640c20cf-082f-4192-8702-415c934d1953"
+
+[build]
+sccache = "/home/varun/.cargo/bin/sccache"
