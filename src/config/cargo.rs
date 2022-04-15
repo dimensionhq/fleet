@@ -93,8 +93,8 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
             },
         },
     };
-
-    let mut toml_string = toml::to_string_pretty(&config).unwrap();
+    println!("{:#?}", config);
+    let toml_string = toml::to_string_pretty(&config).unwrap();
 
     std::fs::write(path, toml_string).unwrap();
 }

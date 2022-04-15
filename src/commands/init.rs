@@ -1,12 +1,15 @@
-use crate::config::{cargo::add_rustc_wrapper_and_target_configs, TurboConfig};
+use crate::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::Red;
 use std::{
     fs::create_dir,
     path,
     process::{exit, Command},
 };
+use sysinfo::{DiskExt, DiskType, System, SystemExt};
 
 pub fn init(app: crate::cli::app::App) {
+    let system = System::new_all();
+
     let cargo_toml = path::Path::new("./Cargo.toml");
     if !cargo_toml.exists() {
         if let Err(cmd) = Command::new("cargo").arg("init").status() {
@@ -35,7 +38,10 @@ pub fn init(app: crate::cli::app::App) {
 
         std::fs::write(config_path, config_file).unwrap();
 
-        if config.turbo {
+        let hdd = system.disks().get(0).unwrap();
+
+        // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
+        if config.turbo && hdd.type_() == DiskType::HDD && wsl::is_wsl() {
             // check if target_dir is not a symlink, if yes delete it
             if !target_dir.is_symlink() && target_dir.exists() {
                 std::fs::remove_dir_all(target_dir.clone()).unwrap();
@@ -66,8 +72,8 @@ pub fn init(app: crate::cli::app::App) {
 
     add_rustc_wrapper_and_target_configs(
         cargo_toml.to_str().unwrap(),
-        &config.build.sccache.to_str().unwrap(),
+        config.build.sccache.to_str().unwrap(),
     );
 
-    println!("{}", "Successfully initialized turbo project");
+    println!("Successfully initialized turbo project");
 }

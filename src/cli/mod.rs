@@ -42,7 +42,13 @@ impl CLI {
                     .status()
                     .unwrap();
             }
-            Command::Build => todo!(),
+            Command::Build => {
+                init(app);
+                std::process::Command::new("cargo")
+                    .arg("build")
+                    .status()
+                    .unwrap();
+            }
             Command::Configure => {
                 std::process::Command::new("cargo")
                     .arg("install")
