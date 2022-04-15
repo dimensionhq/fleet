@@ -1,4 +1,4 @@
-use crate::config::{cargo::add_rustc_wrapper, TurboConfig};
+use crate::config::{cargo::add_rustc_wrapper_and_target_configs, TurboConfig};
 use ansi_term::Colour::Red;
 use std::{
     fs::create_dir,
@@ -7,11 +7,13 @@ use std::{
 };
 
 pub fn init(app: crate::cli::app::App) {
-    if let Err(cmd) = Command::new("cargo").arg("init").status() {
-        println!("{}: Failed to run cargo init {}", Red.paint("error"), cmd);
-        exit(1);
+    let cargo_toml = path::Path::new("./Cargo.toml");
+    if !cargo_toml.exists() {
+        if let Err(cmd) = Command::new("cargo").arg("init").status() {
+            println!("{}: Failed to run cargo init {}", Red.paint("error"), cmd);
+            exit(1);
+        }
     }
-
     let mut config = app.config;
     let os = std::env::consts::OS;
 
@@ -38,13 +40,15 @@ pub fn init(app: crate::cli::app::App) {
             if !target_dir.is_symlink() && target_dir.exists() {
                 std::fs::remove_dir_all(target_dir.clone()).unwrap();
             }
+
             if !turbo_dir.exists() {
                 if let Err(err) = create_dir(turbo_dir.clone()) {
                     println!("{} {}", Red.paint("Error: "), &err);
                     exit(1)
                 }
             }
-            if !cfg!(windows) {
+
+            if !cfg!(windows) && !target_dir.exists() {
                 std::os::unix::fs::symlink(turbo_dir, target_dir).unwrap();
             }
         }
@@ -59,7 +63,8 @@ pub fn init(app: crate::cli::app::App) {
     if !cargo_toml.exists() {
         std::fs::File::create(cargo_toml.clone());
     }
-    add_rustc_wrapper(
+
+    add_rustc_wrapper_and_target_configs(
         cargo_toml.to_str().unwrap(),
         &config.build.sccache.to_str().unwrap(),
     );
