@@ -1,7 +1,7 @@
 pub mod cargo;
-use std::{path::PathBuf, process::exit};
-
+use ansi_term::Colour::{Cyan, Yellow};
 use serde::{Deserialize, Serialize};
+use std::{path::PathBuf, process::exit};
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
@@ -35,10 +35,16 @@ impl TurboConfig {
             .join("sccache");
 
         if !sccache_path.exists() {
-            println!("sccache not found at {:?}", sccache_path);
+            println!(
+                "`{}` {} at {:?}, run {}",
+                Cyan.paint("sccache"),
+                Yellow.paint("not found"),
+                sccache_path,
+                Cyan.paint("`cargo install sccache`")
+            );
         }
 
-        let config_path = std::env::current_dir().unwrap().join(".turbo.toml");
+        let config_path = std::env::current_dir().unwrap().join("turbo.toml");
 
         if config_path.exists() {
             let config_file = std::fs::read_to_string(config_path).unwrap();
@@ -75,7 +81,7 @@ impl TurboConfig {
                 .join("sccache");
 
             config.build.sccache = sccache_path;
-            let config_path = std::env::current_dir().unwrap().join(".turbo.toml");
+            let config_path = std::env::current_dir().unwrap().join("turbo.toml");
             let config_file = toml::to_string(&config).unwrap();
             std::fs::write(config_path, config_file).unwrap();
 

@@ -2,8 +2,8 @@
 name = "turbo"
 version = "0.1.0"
 edition = "2021"
-description = "Rust compilations, made faster"
-authors = ["dimensionhq <team@dimension.dev>"]
+description = "The blazing fast build tool for Rust."
+authors = ["Dimension <team@dimension.dev>"]
 license = "Apache 2.0"
 
 [dependencies]

@@ -1,3 +1,6 @@
+use std::process::exit;
+
+use ansi_term::Colour::Red;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -93,8 +96,18 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
             },
         },
     };
-    println!("{:#?}", config);
+
     let toml_string = toml::to_string_pretty(&config).unwrap();
 
-    std::fs::write(path, toml_string).unwrap();
+    std::fs::write(path, toml_string).unwrap_or_else(|err| {
+        println!(
+            "{}: failed to write configuration: {}",
+            Red.paint("error"),
+            err
+        );
+
+        exit(1);
+    });
+
+    println!("📝 Generated Turbo Config")
 }

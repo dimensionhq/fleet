@@ -24,10 +24,12 @@ pub enum Command {
     about = crate_description!(),
     author = crate_authors!(),
 )]
+
 pub struct CLI {
     #[clap(subcommand)]
     pub subcommand: Command,
 }
+
 impl CLI {
     pub fn run() {
         let cli = CLI::parse();
@@ -37,6 +39,7 @@ impl CLI {
             Command::Init => init(app),
             Command::Run => {
                 init(app);
+
                 std::process::Command::new("cargo")
                     .arg("run")
                     .status()
@@ -44,6 +47,7 @@ impl CLI {
             }
             Command::Build => {
                 init(app);
+
                 std::process::Command::new("cargo")
                     .arg("build")
                     .status()
