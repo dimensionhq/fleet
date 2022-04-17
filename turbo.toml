@@ -1,0 +1,5 @@
+turbo = true
+turbo_id = "e950a227-8d25-40ea-8847-26d1a016161b"
+
+[build]
+sccache = "/home/xtremedevx/.cargo/bin/sccache"

@@ -6,11 +6,15 @@ description = "The blazing fast build tool for Rust."
 authors = ["Dimension <team@dimension.dev>"]
 license = "Apache 2.0"
 
+[build-dependencies]
+rustc_version = "0.4.0"
+
 [dependencies]
 ansi_term = "0.12"
 dirs = "4.0.0"
-wsl="0.1.0"
-sysinfo="0.23.10"
+wsl = "0.1.0"
+sysinfo = "0.23.10"
+rustc_version = "0.4.0"
 
 [dependencies.clap]
 version = "3.1.8"
