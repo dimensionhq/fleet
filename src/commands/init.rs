@@ -64,8 +64,8 @@ pub fn init(app: crate::cli::app::App) {
             }
 
             if !target_dir.exists() {
+                println!("💽 Creating Ramdisk");
                 std::os::unix::fs::symlink(turbo_dir, target_dir).unwrap();
-                println!("💽 Creating Ramdisk")
             }
         }
     }

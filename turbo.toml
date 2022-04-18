@@ -1,5 +1,5 @@
 turbo = true
-turbo_id = "e950a227-8d25-40ea-8847-26d1a016161b"
+turbo_id = "2fe6c77e-91dd-45f0-ae47-85fde2c5ee0d"
 
 [build]
-sccache = "/home/xtremedevx/.cargo/bin/sccache"
+sccache = "/home/tejas/.cargo/bin/sccache"
