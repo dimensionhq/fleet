@@ -15,11 +15,17 @@ pub struct FleetConfig {
     pub build: Build,
 }
 
+impl Default for FleetConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FleetConfig {
     pub fn new() -> Self {
         Self {
             rd_enabled: false,
-            fleet_id: "".to_string(),
+            fleet_id: String::from(""),
             build: Build {
                 sccache: PathBuf::from("~/.cargo/bin/sccache"),
             },

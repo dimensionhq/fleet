@@ -7,6 +7,12 @@ pub struct App {
     pub current_dir: PathBuf,
 }
 
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl App {
     pub fn new() -> Self {
         let current_dir = current_dir().unwrap();

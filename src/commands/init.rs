@@ -1,18 +1,13 @@
 use crate::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
-    fs::create_dir,
     path,
     process::{exit, Command},
 };
+#[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
 pub fn init(app: crate::cli::app::App) {
-    let refresh_kind = RefreshKind::new();
-    let disks = refresh_kind.with_disks_list();
-
-    let system = System::new_with_specifics(disks);
-
     let cargo_toml = path::Path::new("./Cargo.toml");
 
     if !cargo_toml.exists() {
@@ -28,10 +23,6 @@ pub fn init(app: crate::cli::app::App) {
     if os == "windows" {
         panic!("Fleet doesn't support windows yet.");
     } else {
-        let ramdisk_dir = path::Path::new("/dev/shm");
-        let fleet_dir = ramdisk_dir.join(&config.fleet_id);
-        let target_dir = std::env::current_dir().unwrap().join("target");
-
         let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
             .join(".cargo")
             .join("bin")
@@ -44,10 +35,20 @@ pub fn init(app: crate::cli::app::App) {
 
         std::fs::write(config_path, config_file).unwrap();
 
-        let disk = system.disks().get(0).unwrap();
-
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
+        #[cfg(unix)]
         if config.rd_enabled && disk.type_() == DiskType::HDD && wsl::is_wsl() {
+            let refresh_kind = RefreshKind::new();
+            let disks = refresh_kind.with_disks_list();
+
+            let system = System::new_with_specifics(disks);
+
+            let ramdisk_dir = path::Path::new("/dev/shm");
+            let fleet_dir = ramdisk_dir.join(&config.fleet_id);
+            let target_dir = std::env::current_dir().unwrap().join("target");
+
+            let disk = system.disks().get(0).unwrap();
+
             // check if target_dir is not a symlink, if yes delete it
             if !target_dir.is_symlink() && target_dir.exists() {
                 if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
@@ -57,7 +58,7 @@ pub fn init(app: crate::cli::app::App) {
             }
 
             if !fleet_dir.exists() {
-                if let Err(err) = create_dir(fleet_dir.clone()) {
+                if let Err(err) = std::fs::create_dir(fleet_dir.clone()) {
                     println!("{} {}", Red.paint("error: "), &err);
                     exit(1)
                 }
