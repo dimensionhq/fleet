@@ -26,10 +26,10 @@ pub fn init(app: crate::cli::app::App) {
     let os = std::env::consts::OS;
 
     if os == "windows" {
-        panic!("Turbo doesn't support windows yet.");
+        panic!("Fleet doesn't support windows yet.");
     } else {
         let ramdisk_dir = path::Path::new("/dev/shm");
-        let turbo_dir = ramdisk_dir.join(&config.turbo_id);
+        let fleet_dir = ramdisk_dir.join(&config.fleet_id);
         let target_dir = std::env::current_dir().unwrap().join("target");
 
         let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
@@ -39,7 +39,7 @@ pub fn init(app: crate::cli::app::App) {
 
         config.build.sccache = sccache_path;
 
-        let config_path = std::env::current_dir().unwrap().join("turbo.toml");
+        let config_path = std::env::current_dir().unwrap().join("fleet.toml");
         let config_file = toml::to_string(&config).unwrap();
 
         std::fs::write(config_path, config_file).unwrap();
@@ -47,7 +47,7 @@ pub fn init(app: crate::cli::app::App) {
         let disk = system.disks().get(0).unwrap();
 
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
-        if config.turbo && disk.type_() == DiskType::HDD && wsl::is_wsl() {
+        if config.rd_enabled && disk.type_() == DiskType::HDD && wsl::is_wsl() {
             // check if target_dir is not a symlink, if yes delete it
             if !target_dir.is_symlink() && target_dir.exists() {
                 if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
@@ -56,8 +56,8 @@ pub fn init(app: crate::cli::app::App) {
                 }
             }
 
-            if !turbo_dir.exists() {
-                if let Err(err) = create_dir(turbo_dir.clone()) {
+            if !fleet_dir.exists() {
+                if let Err(err) = create_dir(fleet_dir.clone()) {
                     println!("{} {}", Red.paint("error: "), &err);
                     exit(1)
                 }
@@ -65,7 +65,7 @@ pub fn init(app: crate::cli::app::App) {
 
             if !target_dir.exists() {
                 println!("💽 Creating Ramdisk");
-                std::os::unix::fs::symlink(turbo_dir, target_dir).unwrap();
+                std::os::unix::fs::symlink(fleet_dir, target_dir).unwrap();
             }
         }
     }
@@ -93,5 +93,5 @@ pub fn init(app: crate::cli::app::App) {
         config.build.sccache.to_str().unwrap(),
     );
 
-    println!("🚀 {}", Green.paint("Turbo is ready!"));
+    println!("🚀 {}", Green.paint("Fleet is ready!"));
 }

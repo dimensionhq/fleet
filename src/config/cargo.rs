@@ -109,5 +109,5 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
         exit(1);
     });
 
-    println!("📝 Generated Turbo Config")
+    println!("📝 Generated Fleet Config")
 }

@@ -9,17 +9,17 @@ pub struct Build {
 }
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
-pub struct TurboConfig {
-    pub turbo: bool,
-    pub turbo_id: String,
+pub struct FleetConfig {
+    pub rd_enabled: bool,
+    pub fleet_id: String,
     pub build: Build,
 }
 
-impl TurboConfig {
+impl FleetConfig {
     pub fn new() -> Self {
         Self {
-            turbo: false,
-            turbo_id: "".to_string(),
+            rd_enabled: false,
+            fleet_id: "".to_string(),
             build: Build {
                 sccache: PathBuf::from("~/.cargo/bin/sccache"),
             },
@@ -44,7 +44,7 @@ impl TurboConfig {
             );
         }
 
-        let config_path = std::env::current_dir().unwrap().join("turbo.toml");
+        let config_path = std::env::current_dir().unwrap().join("fleet.toml");
 
         if config_path.exists() {
             let config_file = std::fs::read_to_string(config_path).unwrap();
@@ -54,13 +54,13 @@ impl TurboConfig {
                 self.update_sccache(&mut config, sccache_path);
                 config
             } else {
-                println!("Invalid turbo config");
+                println!("Invalid fleet configuration");
                 exit(1)
             }
         } else {
-            let config = TurboConfig {
-                turbo: true,
-                turbo_id: uuid::Uuid::new_v4().to_string(),
+            let config = FleetConfig {
+                rd_enabled: true,
+                fleet_id: uuid::Uuid::new_v4().to_string(),
                 build: Build {
                     sccache: sccache_path,
                 },
@@ -81,7 +81,7 @@ impl TurboConfig {
                 .join("sccache");
 
             config.build.sccache = sccache_path;
-            let config_path = std::env::current_dir().unwrap().join("turbo.toml");
+            let config_path = std::env::current_dir().unwrap().join("fleet.toml");
             let config_file = toml::to_string(&config).unwrap();
             std::fs::write(config_path, config_file).unwrap();
 

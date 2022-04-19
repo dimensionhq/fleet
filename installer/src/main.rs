@@ -41,7 +41,7 @@ pub fn set_compiler_nightly() {
 }
 
 fn main() {
-    println!("🚀 Installing Turbo");
+    println!("🚀 Installing Fleet");
 
     match std::env::consts::OS {
         "macos" => {

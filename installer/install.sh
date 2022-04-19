@@ -1,6 +1,6 @@
-echo Downloading Turbo installer...
+echo Downloading Fleet installer...
 # Download the installer
-curl https://cdn.dimension.dev/dimension/turbo/bin/installer.bin -o installer.bin
+curl https://cdn.dimension.dev/dimension/fleet/bin/installer.bin -o installer.bin
 # Make it an executable
 chmod +x installer.bin
 # Run the installer

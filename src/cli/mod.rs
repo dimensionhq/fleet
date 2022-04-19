@@ -9,9 +9,9 @@ pub mod app;
 
 #[derive(Debug, Parser)]
 pub enum Command {
-    /// Run a turbo project
+    /// Run a Fleet project
     Run,
-    /// Build a turbo project
+    /// Build a Fleet project
     Build,
 }
 

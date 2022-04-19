@@ -5,5 +5,5 @@ pub mod commands;
 pub mod config;
 
 fn main() {
-    let _cli = CLI::run();
+    let _ = CLI::run();
 }
