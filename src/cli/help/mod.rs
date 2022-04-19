@@ -1,4 +1,4 @@
-use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
+use ansi_term::Colour::{Green, Yellow};
 
 pub fn build_run_help_message() -> String {
     let help_menu = format!(
@@ -7,7 +7,7 @@ Dimension <team@dimension.dev>
 The blazing fast build tool for Rust.
 
 {}:
-    fleet <SUBCOMMAND>
+    fleet build [OPTIONS]
 
 {}:
     -q, --quiet                     Do not print cargo log messages
@@ -37,15 +37,11 @@ The blazing fast build tool for Rust.
         --ignore-rust-version       Ignore `rust-version` specification in packages
         --timings[=<FMTS>...]       Timing output formats (unstable) (comma separated): html, json
     -h, --help                      Print help information
-
-{}:
-    build    Build a Fleet project
-    run      Run a Fleet project"#,
+"#,
         Green.paint("fleet"),
         env!("CARGO_PKG_VERSION"),
         Yellow.paint("USAGE"),
         Yellow.paint("OPTIONS"),
-        Yellow.paint("SUBCOMMANDS"),
     );
 
     help_menu
@@ -58,7 +54,7 @@ Dimension <team@dimension.dev>
 The blazing fast build tool for Rust.
 
 {}:
-    fleet <SUBCOMMAND>
+    fleet build [OPTIONS]
 
 {}:
     -q, --quiet                     Do not print cargo log messages
@@ -88,15 +84,11 @@ The blazing fast build tool for Rust.
         --ignore-rust-version       Ignore `rust-version` specification in packages
         --timings[=<FMTS>...]       Timing output formats (unstable) (comma separated): html, json
     -h, --help                      Print help information
-
-{}:
-    build    Build a Fleet project
-    run      Run a Fleet project"#,
+"#,
         Green.paint("fleet"),
         env!("CARGO_PKG_VERSION"),
         Yellow.paint("USAGE"),
         Yellow.paint("OPTIONS"),
-        Yellow.paint("SUBCOMMANDS"),
     );
     help_menu
 }

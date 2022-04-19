@@ -142,7 +142,7 @@ The blazing fast build tool for Rust.
         let args = std::env::args().collect::<Vec<String>>();
         let app = App::new();
 
-        if !(args.len() > 1) {
+        if args.len() <= 1 {
             CLI::display_help("help");
         } else {
             let cmd = &args[1];
