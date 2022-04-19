@@ -21,7 +21,6 @@ pub fn init(app: crate::cli::app::App) {
     let os = std::env::consts::OS;
 
     if os == "windows" {
-        panic!("Fleet doesn't support windows yet.");
     } else {
         let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
             .join(".cargo")
