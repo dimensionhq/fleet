@@ -1,0 +1,10 @@
+[package]
+name = "installer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+owo-colors = "3.3.0"
+enable-ansi-support = "0.1.2"

@@ -22,7 +22,7 @@ pub enum Command {
     about = crate_description!(),
     author = crate_authors!(),
 )]
-
+// ignore clap parsing errors
 pub struct CLI {
     #[clap(subcommand)]
     pub subcommand: Command,
