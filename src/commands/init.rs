@@ -37,36 +37,36 @@ pub fn init(app: crate::cli::app::App) {
 
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
         #[cfg(unix)]
-        if config.rd_enabled && disk.type_() == DiskType::HDD && wsl::is_wsl() {
+        {
             let refresh_kind = RefreshKind::new();
             let disks = refresh_kind.with_disks_list();
-
             let system = System::new_with_specifics(disks);
-
-            let ramdisk_dir = path::Path::new("/dev/shm");
-            let fleet_dir = ramdisk_dir.join(&config.fleet_id);
-            let target_dir = std::env::current_dir().unwrap().join("target");
-
             let disk = system.disks().get(0).unwrap();
 
-            // check if target_dir is not a symlink, if yes delete it
-            if !target_dir.is_symlink() && target_dir.exists() {
-                if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
-                    println!("{} {}", Red.paint("error: "), &err);
-                    exit(1)
-                }
-            }
+            if config.rd_enabled || disk.type_() == DiskType::HDD || wsl::is_wsl() {
+                let ramdisk_dir = path::Path::new("/dev/shm");
+                let fleet_dir = ramdisk_dir.join(&config.fleet_id);
+                let target_dir = std::env::current_dir().unwrap().join("target");
 
-            if !fleet_dir.exists() {
-                if let Err(err) = std::fs::create_dir(fleet_dir.clone()) {
-                    println!("{} {}", Red.paint("error: "), &err);
-                    exit(1)
+                // check if target_dir is not a symlink, if yes delete it
+                if !target_dir.is_symlink() && target_dir.exists() {
+                    if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
+                        println!("{} {}", Red.paint("error: "), &err);
+                        exit(1)
+                    }
                 }
-            }
 
-            if !target_dir.exists() {
-                println!("💽 Creating Ramdisk");
-                std::os::unix::fs::symlink(fleet_dir, target_dir).unwrap();
+                if !fleet_dir.exists() {
+                    if let Err(err) = std::fs::create_dir(fleet_dir.clone()) {
+                        println!("{} {}", Red.paint("error: "), &err);
+                        exit(1)
+                    }
+                }
+
+                if !target_dir.exists() {
+                    println!("💽 Creating Ramdisk");
+                    std::os::unix::fs::symlink(fleet_dir, target_dir).unwrap();
+                }
             }
         }
     }
