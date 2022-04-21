@@ -7,7 +7,7 @@ Dimension <team@dimension.dev>
 The blazing fast build tool for Rust.
 
 {}:
-    fleet build [OPTIONS]
+    fleet run [OPTIONS]
 
 {}:
     -q, --quiet                     Do not print cargo log messages
@@ -58,30 +58,44 @@ The blazing fast build tool for Rust.
 
 {}:
     -q, --quiet                     Do not print cargo log messages
-        --bin [<NAME>]              Name of the bin target to run
-        --example [<NAME>]          Name of the example target to run
-    -p, --package [<SPEC>...]       Package with the target to run
+    -p, --package [<SPEC>]          Package to build (see `cargo help pkgid`)
+        --workspace                 Build all packages in the workspace
+        --exclude <SPEC>            Exclude packages from the build
     -v, --verbose                   Use verbose output (-vv very verbose/build.rs output)
-    -j, --jobs <N>                  Number of parallel jobs, defaults to # of CPUs
+        --all                       Alias for --workspace (deprecated)
         --color <WHEN>              Coloring: auto, always, never
-        --keep-going                Do not abort the build as soon as there is an error (unstable)
+    -j, --jobs <N>                  Number of parallel jobs, defaults to # of CPUs
         --frozen                    Require Cargo.lock and cache are up to date
-    -r, --release                   Build artifacts in release mode, with optimizations
+        --keep-going                Do not abort the build as soon as there is an error (unstable)
+        --lib                       Build only this package's library
         --locked                    Require Cargo.lock is up to date
-        --profile <PROFILE-NAME>    Build artifacts with the specified profile
-        --features <FEATURES>       Space or comma separated list of features to activate
+        --bin [<NAME>]              Build only the specified binary
         --offline                   Run without accessing the network
-        --all-features              Activate all available features
+        --bins                      Build all binaries
         --config <KEY=VALUE>        Override a configuration value (unstable)
-        --no-default-features       Do not activate the `default` feature
+        --example [<NAME>]          Build only the specified example
     -Z <FLAG>                       Unstable (nightly-only) flags to Cargo, see 'cargo -Z help' for
                                     details
+        --examples                  Build all examples
+        --test [<NAME>]             Build only the specified test target
+        --tests                     Build all tests
+        --bench [<NAME>]            Build only the specified bench target
+        --benches                   Build all benches
+        --all-targets               Build all targets
+    -r, --release                   Build artifacts in release mode, with optimizations
+        --profile <PROFILE-NAME>    Build artifacts with the specified profile
+        --features <FEATURES>       Space or comma separated list of features to activate
+        --all-features              Activate all available features
+        --no-default-features       Do not activate the `default` feature
         --target <TRIPLE>           Build for the target triple
         --target-dir <DIRECTORY>    Directory for all generated artifacts
+        --out-dir <PATH>            Copy final artifacts to this directory (unstable)
         --manifest-path <PATH>      Path to Cargo.toml
-        --message-format <FMT>      Error format
-        --unit-graph                Output build graph in JSON (unstable)
         --ignore-rust-version       Ignore `rust-version` specification in packages
+        --message-format <FMT>      Error format
+        --build-plan                Output the build plan in JSON (unstable)
+        --unit-graph                Output build graph in JSON (unstable)
+        --future-incompat-report    Outputs a future incompatibility report at the end of the build
         --timings[=<FMTS>...]       Timing output formats (unstable) (comma separated): html, json
     -h, --help                      Print help information
 "#,

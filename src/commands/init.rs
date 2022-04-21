@@ -20,8 +20,7 @@ pub fn init(app: crate::cli::app::App) {
     let mut config = app.config;
     let os = std::env::consts::OS;
 
-    if os == "windows" {
-    } else {
+    if os != "windows" {
         let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
             .join(".cargo")
             .join("bin")
@@ -30,6 +29,7 @@ pub fn init(app: crate::cli::app::App) {
         config.build.sccache = sccache_path;
 
         let config_path = std::env::current_dir().unwrap().join("fleet.toml");
+
         let config_file = toml::to_string(&config).unwrap();
 
         std::fs::write(config_path, config_file).unwrap();

@@ -17,6 +17,7 @@ impl App {
     pub fn new() -> Self {
         let current_dir = current_dir().unwrap();
         let config = FleetConfig::new();
+        // check
         let config = config.run_config();
 
         Self {
