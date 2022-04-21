@@ -1,5 +1,5 @@
 [package]
-name = "cargo-fleet"
+name = "fleet-rs"
 version = "0.0.1"
 edition = "2021"
 description = "The blazing fast build tool for Rust."

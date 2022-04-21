@@ -35,21 +35,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
-name = "cargo-fleet"
-version = "0.0.1"
-dependencies = [
- "ansi_term",
- "clap",
- "dirs",
- "rustc_version",
- "serde",
- "sysinfo",
- "toml",
- "uuid",
- "wsl",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -160,6 +145,21 @@ name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
+
+[[package]]
+name = "fleet-rs"
+version = "0.0.1"
+dependencies = [
+ "ansi_term",
+ "clap",
+ "dirs",
+ "rustc_version",
+ "serde",
+ "sysinfo",
+ "toml",
+ "uuid",
+ "wsl",
+]
 
 [[package]]
 name = "getrandom"
