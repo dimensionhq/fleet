@@ -23,15 +23,8 @@ jobs:
           toolchain: nightly
           components: clippy
           override: true
-          
-      - name: Set up Clang
-        uses: egor-tensin/setup-clang@v1
-        with:
-          version: latest
-          platform: x64
 
-
-      - name: Cache .cargo/bin
+      - name: Cache ~/.cargo/bin
         uses: actions/cache@v3
         
         env:
