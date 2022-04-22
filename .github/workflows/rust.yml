@@ -23,6 +23,13 @@ jobs:
           toolchain: nightly
           components: clippy
           override: true
+          
+      - name: Set up Clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
+
 
       - name: Cache .cargo/bin
         uses: actions/cache@v3
@@ -45,4 +52,4 @@ jobs:
         run: if [ -e ~/.cargo/bin/fleet ] ; then echo "Fleet is already installed"; else cargo install fleet-rs; fi
 
       - name: Run app using fleet
-        run: fleet run
+        run: fleet run --bin fleet
