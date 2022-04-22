@@ -45,10 +45,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install sccache        
-        run: if [ -e ~/.cargo/bin/sccache ] ; then echo "Sccache is already installed"; else cargo install sccache; fi
+        run: if (Test-Path -Path ~\.cargo\bin\sccache.exe -PathType Leaf) {echo "Sccache is already installed"} else { cargo install sccache }
 
       - name: Install fleet
-        run: if [ -e ~/.cargo/bin/fleet ] ; then echo "Fleet is already installed"; else cargo install fleet-rs; fi
+        run: if (Test-Path -Path ~\.cargo\bin\fleet.exe -PathType Leaf) {echo "Fleet is already installed"} else { cargo install fleet-rs }
 
       - name: Run app using fleet
         run: fleet run --bin fleet
