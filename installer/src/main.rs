@@ -40,6 +40,23 @@ pub fn set_compiler_nightly() {
     }
 }
 
+pub fn install_fleet() {
+    println!("{}", "> cargo install fleet".bright_cyan());
+
+    // Install Fleet
+    let status = Command::new("cargo")
+        .arg("install")
+        .arg("fleet")
+        .status()
+        .unwrap();
+
+    if status.success() {
+        println!("{}", "Installed Fleet".bright_green());
+    } else {
+        println!("{}", "Failed to install Fleet".bright_red());
+    }
+}
+
 fn main() {
     println!("🚀 Installing Fleet");
 
@@ -57,6 +74,7 @@ fn main() {
             }
 
             install_sccache();
+            install_fleet();
             set_compiler_nightly();
 
             println!("{}", "Installation complete".bright_green());
@@ -87,6 +105,7 @@ fn main() {
             }
 
             install_sccache();
+            install_fleet();
             set_compiler_nightly();
 
             println!("{}", "Installation complete".bright_green());
@@ -97,6 +116,7 @@ fn main() {
             let _ = enable_ansi_support::enable_ansi_support();
 
             install_sccache();
+            install_fleet();
             set_compiler_nightly();
 
             println!("{}", "Installation complete".bright_green());
