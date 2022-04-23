@@ -1,2 +1,4 @@
 /target
 installer/target
+# You can't build fleet without fleet already installed if we have the .cargo directory with optimizations
+.cargo/
