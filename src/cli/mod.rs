@@ -17,7 +17,7 @@
 
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
-use std::{env, process::exit};
+use std::{env, path::PathBuf, process::exit};
 
 use crate::commands::init::init;
 
@@ -69,11 +69,14 @@ impl CLI {
             }
         }
 
+        let cargo_home_path = std::env::var("CARGO_HOME");
+        let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
+        if let Ok(cargo_home) = cargo_home_path {
+            cargo_path = PathBuf::from(cargo_home);
+        }
+
         // check if sccache is installed
-        let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
-            .join(".cargo")
-            .join("bin")
-            .join("sccache");
+        let sccache_path = cargo_path.join("sccache");
 
         if !sccache_path.exists() {
             println!(
