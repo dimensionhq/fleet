@@ -74,11 +74,11 @@ impl CLI {
         if let Ok(cargo_home) = cargo_home_path {
             cargo_path = PathBuf::from(cargo_home).join("bin");
         }
-        
+
         // check if sccache is installed
         let mut sccache_path = cargo_path.join("sccache");
-        if cfg!(windows){
-           sccache_path = cargo_path.join("sccache.exe");
+        if cfg!(windows) {
+            sccache_path = cargo_path.join("sccache.exe");
         }
 
         if !sccache_path.exists() {
@@ -140,8 +140,9 @@ The blazing fast build tool for Rust.
     fleet <SUBCOMMAND>
 
 {}:
-    -h, --help       Print help information
-    -V, --version    Print version information
+    -h, --help            Print help information
+    -v, --version         Print version information
+    -up, --update-path    Update paths in .cargo/config.toml
 
 {}:
     build    Build a Fleet project
@@ -178,6 +179,12 @@ The blazing fast build tool for Rust.
 
             if args.contains(&String::from("--version")) || args.contains(&String::from("-v")) {
                 println!("{}", VERSION);
+                std::process::exit(1)
+            }
+
+            if args.contains(&String::from("--update-path")) || args.contains(&String::from("-up"))
+            {
+                init(app);
                 std::process::exit(1)
             }
             match cmd.as_str() {
