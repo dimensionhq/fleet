@@ -50,12 +50,13 @@ impl FleetConfig {
     }
 
     pub fn run_config(&self) -> Self {
-        let home_dir = dirs::home_dir().unwrap();
+        let cargo_home_path = std::env::var("CARGO_HOME");
+        let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
+        if let Ok(cargo_home) = cargo_home_path {
+            cargo_path = PathBuf::from(cargo_home);
+        }
 
-        let sccache_path = std::path::Path::new(&home_dir)
-            .join(".cargo")
-            .join("bin")
-            .join("sccache");
+        let sccache_path = cargo_path.join("sccache");
 
         if !sccache_path.exists() {
             println!(
