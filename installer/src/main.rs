@@ -65,7 +65,7 @@ fn main() {
             println!("💻 Installing for MacOS");
 
             // Install zld, sccache
-            let status = Command::new("brew").arg("install").arg("zld").status();
+            let status = Command::new("brew").arg("install").arg("michaeleisel/zld/zld").status();
 
             if status.is_ok() {
                 println!("{}", "Installed zld".bright_green());
@@ -73,9 +73,9 @@ fn main() {
                 println!("{}", "Failed to install zld".bright_red());
             }
 
-            install_sccache();
-            install_fleet();
             set_compiler_nightly();
+	    install_sccache();
+            install_fleet();
 
             println!("{}", "Installation complete".bright_green());
         }
@@ -104,9 +104,9 @@ fn main() {
                 println!("{}", "Failed to install lld, clang".bright_red());
             }
 
+            set_compiler_nightly();
             install_sccache();
             install_fleet();
-            set_compiler_nightly();
 
             println!("{}", "Installation complete".bright_green());
         }
@@ -115,9 +115,9 @@ fn main() {
 
             let _ = enable_ansi_support::enable_ansi_support();
 
+            set_compiler_nightly();
             install_sccache();
             install_fleet();
-            set_compiler_nightly();
 
             println!("{}", "Installation complete".bright_green());
         }
