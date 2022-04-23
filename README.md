@@ -29,21 +29,10 @@ iwr -useb windows.fleet.rs | iex
 
 ## Building from source
 Prerequisites: **Rust**
-
-1. Clone the github repository using the Github CLI.
 ```powershell
-git clone https://github.com/dimensionhq/fleet
+cargo install --git https://github.com/dimensionhq/fleet fleet-rs
 ```
 
-2. Change to the fleet directory.
-```powershell
-cd fleet
-```
-
-3. Install the `fleet` CLI using `cargo`.
-```powershell
-cargo install --path .
-```
 
 ## How does fleet work?
 
