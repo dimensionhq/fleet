@@ -93,8 +93,9 @@ pub fn init(app: crate::cli::app::App) {
     std::fs::create_dir_all(&cargo_manifest_dir).unwrap();
 
     let config_toml = cargo_manifest_dir.join("config.toml");
+    let config_no_toml = cargo_manifest_dir.join("config");
 
-    if !config_toml.exists() {
+    if !config_toml.exists() && !config_no_toml.exists() {
         std::fs::File::create(&config_toml).unwrap_or_else(|err| {
             println!(
                 "{}: failed to create configuration files: {}",
@@ -106,7 +107,11 @@ pub fn init(app: crate::cli::app::App) {
     }
 
     add_rustc_wrapper_and_target_configs(
-        config_toml.to_str().unwrap(),
+        if config_toml.exists() {
+            config_toml.to_str().unwrap()
+        } else {
+            config_no_toml.to_str().unwrap()
+        },
         config.build.sccache.to_str().unwrap(),
     );
 
