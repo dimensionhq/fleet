@@ -24,24 +24,13 @@ jobs:
           components: clippy
           override: true
 
-      - name: Cache ~/.cargo/bin
-        uses: actions/cache@v3
-        
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.cargo/bin
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      - uses: Swatinem/rust-cache@v1
+
       - name: Install sccache        
-        run: if (Test-Path -Path ~\.cargo\bin\sccache.exe -PathType Leaf) {echo "Sccache is already installed"} else { cargo install sccache }
+        run: if (Test-Path -Path ~\.cargo\bin\sccache.exe -PathType Leaf) {echo "Sccache is already installed"} else { cargo install sccache -f }
 
       - name: Install fleet
-        run: if (Test-Path -Path ~\.cargo\bin\fleet.exe -PathType Leaf) {echo "Fleet is already installed"} else { cargo install fleet-rs }
+        run: if (Test-Path -Path ~\.cargo\bin\fleet.exe -PathType Leaf) {echo "Fleet is already installed"} else { cargo install fleet-rs -f }
 
       - name: Run app using fleet
-        run: fleet run --bin fleet
+        run: fleet build --bin fleet
