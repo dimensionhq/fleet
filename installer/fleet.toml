@@ -1,0 +1,5 @@
+rd_enabled = true
+fleet_id = "c3e72e77-71d5-4b60-b849-972f237efe9b"
+
+[build]
+sccache = "/Users/xtremedevx/.cargo/bin/sccache"

@@ -30,7 +30,7 @@ pub fn set_compiler_nightly() {
 
     if status.success() {
         println!(
-            "{}{}{}",
+            "{} {} {}",
             "Switched to".bright_green(),
             "nightly".bright_blue(),
             "compiler".bright_green(),
@@ -41,12 +41,12 @@ pub fn set_compiler_nightly() {
 }
 
 pub fn install_fleet() {
-    println!("{}", "> cargo install fleet".bright_cyan());
+    println!("{}", "> cargo install fleet-rs".bright_cyan());
 
     // Install Fleet
     let status = Command::new("cargo")
         .arg("install")
-        .arg("fleet")
+        .arg("fleet-rs")
         .status()
         .unwrap();
 
