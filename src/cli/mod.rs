@@ -171,7 +171,12 @@ The blazing fast build tool for Rust.
                 CLI::display_help(cmd);
                 std::process::exit(1)
             }
+            const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+            if args.contains(&String::from("--version")) || args.contains(&String::from("-v")) {
+                println!("{}", VERSION);
+                std::process::exit(1)
+            }
             match cmd.as_str() {
                 "run" => {
                     init(app);
