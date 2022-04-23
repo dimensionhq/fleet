@@ -47,10 +47,12 @@ pub fn init(app: crate::cli::app::App) {
         Err(_) => cargo_path = cargo_path.join(".cargo").join("bin"),
     }
 
-    let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
-        .join(cargo_path)
+    let mut sccache_path = cargo_path
         .join("sccache");
 
+    if cfg!(windows){
+        sccache_path = cargo_path.join("sccache.exe");
+    }
     config.build.sccache = sccache_path;
 
     let config_path = std::env::current_dir().unwrap().join("fleet.toml");

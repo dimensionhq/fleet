@@ -56,8 +56,10 @@ impl FleetConfig {
             cargo_path = PathBuf::from(cargo_home).join("bin");
         }
 
-        let sccache_path = cargo_path.join("sccache");
-
+        let mut sccache_path = cargo_path.join("sccache");
+        if cfg!(windows){
+            sccache_path = cargo_path.join("sccache.exe");
+        }
         if !sccache_path.exists() {
             println!(
                 "`{}` {} at {:?}, run {}",

@@ -1,5 +1,5 @@
 [build]
-rustc-wrapper = '/home/varun/.cargo/bin/sccache'
+rustc-wrapper = 'C:\Users\potti\.cargo\bin\sccache'
 [target.x86_64-unknown-linux-gnu]
 rustflags = [
     '-Clink-arg=-fuse-ld=lld',
@@ -11,7 +11,7 @@ linker = '/usr/bin/clang'
 rustflags = ['-Zshare-generics=y']
 linker = 'rust-lld.exe'
 
-[target."target.x86_64-apple-darwin"]
+[target.x86_64-apple-darwin]
 rustflags = [
     '-C',
     'link-arg=-fuse-ld=/usr/local/bin/zld',

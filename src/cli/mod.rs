@@ -74,9 +74,12 @@ impl CLI {
         if let Ok(cargo_home) = cargo_home_path {
             cargo_path = PathBuf::from(cargo_home).join("bin");
         }
-
+        
         // check if sccache is installed
-        let sccache_path = cargo_path.join("sccache");
+        let mut sccache_path = cargo_path.join("sccache");
+        if cfg!(windows){
+           sccache_path = cargo_path.join("sccache.exe");
+        }
 
         if !sccache_path.exists() {
             println!(
