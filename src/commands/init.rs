@@ -42,15 +42,13 @@ pub fn init(app: crate::cli::app::App) {
 
     match path {
         Ok(p) => {
-            cargo_path = PathBuf::from(p);
+            cargo_path = PathBuf::from(p).join("bin");
         }
         Err(_) => cargo_path = cargo_path.join(".cargo").join("bin"),
     }
+    let mut sccache_path = cargo_path.join("sccache");
 
-    let mut sccache_path = cargo_path
-        .join("sccache");
-
-    if cfg!(windows){
+    if cfg!(windows) {
         sccache_path = cargo_path.join("sccache.exe");
     }
     config.build.sccache = sccache_path;
