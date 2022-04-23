@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-use crate::config::cargo::add_rustc_wrapper_and_target_configs;
+use crate::config::cargo::{self, add_rustc_wrapper_and_target_configs};
 use ansi_term::Colour::{Green, Red};
 use std::{
-    path,
+    path::{self, PathBuf},
     process::{exit, Command},
 };
 #[cfg(unix)]
@@ -37,20 +37,28 @@ pub fn init(app: crate::cli::app::App) {
     let mut config = app.config;
     let os = std::env::consts::OS;
 
+    let path = std::env::var("CARGO_HOME");
+    let mut cargo_path = dirs::home_dir().unwrap();
+
+    match path {
+        Ok(p) => {
+            cargo_path = PathBuf::from(p);
+        }
+        Err(_) => cargo_path = cargo_path.join(".cargo").join("bin"),
+    }
+
+    let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
+        .join(cargo_path)
+        .join("sccache");
+
+    config.build.sccache = sccache_path;
+
+    let config_path = std::env::current_dir().unwrap().join("fleet.toml");
+
+    let config_file = toml::to_string(&config).unwrap();
+
+    std::fs::write(config_path, config_file).unwrap();
     if os != "windows" {
-        let sccache_path = std::path::Path::new(&dirs::home_dir().unwrap())
-            .join(".cargo")
-            .join("bin")
-            .join("sccache");
-
-        config.build.sccache = sccache_path;
-
-        let config_path = std::env::current_dir().unwrap().join("fleet.toml");
-
-        let config_file = toml::to_string(&config).unwrap();
-
-        std::fs::write(config_path, config_file).unwrap();
-
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
         #[cfg(unix)]
         {
@@ -59,7 +67,7 @@ pub fn init(app: crate::cli::app::App) {
             let system = System::new_with_specifics(disks);
             let disk = system.disks().get(0).unwrap();
 
-            if config.rd_enabled || disk.type_() == DiskType::HDD || wsl::is_wsl() {
+            if disk.type_() == DiskType::HDD || wsl::is_wsl() {
                 let ramdisk_dir = path::Path::new("/dev/shm");
                 let fleet_dir = ramdisk_dir.join(&config.fleet_id);
                 let target_dir = std::env::current_dir().unwrap().join("target");
