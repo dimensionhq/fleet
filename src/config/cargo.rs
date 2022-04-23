@@ -64,7 +64,7 @@ pub struct Target {
     pub linux: TartgetValues,
     #[serde(rename = "x86_64-pc-windows-msvc")]
     pub windows: TartgetValues,
-    #[serde(rename = "target.x86_64-apple-darwin")]
+    #[serde(rename = "x86_64-apple-darwin")]
     pub mac: TartgetValues,
 }
 
