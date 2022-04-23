@@ -53,7 +53,7 @@ impl FleetConfig {
         let cargo_home_path = std::env::var("CARGO_HOME");
         let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
         if let Ok(cargo_home) = cargo_home_path {
-            cargo_path = PathBuf::from(cargo_home);
+            cargo_path = PathBuf::from(cargo_home).join("bin");
         }
 
         let sccache_path = cargo_path.join("sccache");

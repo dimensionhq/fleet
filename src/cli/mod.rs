@@ -72,7 +72,7 @@ impl CLI {
         let cargo_home_path = std::env::var("CARGO_HOME");
         let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
         if let Ok(cargo_home) = cargo_home_path {
-            cargo_path = PathBuf::from(cargo_home);
+            cargo_path = PathBuf::from(cargo_home).join("bin");
         }
 
         // check if sccache is installed
