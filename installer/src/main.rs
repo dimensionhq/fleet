@@ -8,6 +8,7 @@ pub fn install_sccache() {
     let status = Command::new("cargo")
         .arg("install")
         .arg("sccache")
+        .arg("-f")
         .status()
         .unwrap();
 
@@ -47,6 +48,7 @@ pub fn install_fleet() {
     let status = Command::new("cargo")
         .arg("install")
         .arg("fleet-rs")
+        .arg("-f")
         .status()
         .unwrap();
 
