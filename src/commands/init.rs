@@ -61,7 +61,7 @@ pub fn init(app: crate::cli::app::App) {
     std::fs::write(config_path, config_file).unwrap();
     if os != "windows" {
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
-        #[cfg(unix)]
+        #[cfg(linux)]
         {
             let refresh_kind = RefreshKind::new();
             let disks = refresh_kind.with_disks_list();
