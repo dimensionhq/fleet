@@ -91,7 +91,7 @@ impl CLI {
         }
 
         // check if lld is available (on linux) and zld on macos
-        if cfg!(unix) {
+        if cfg!(linux) {
             let lld_path = std::path::Path::new("/usr/bin/lld");
 
             if !lld_path.exists() {
