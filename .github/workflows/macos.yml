@@ -61,5 +61,5 @@ jobs:
         run: cargo install --git https://github.com/dimensionhq/fleet fleet-rs
 
       - name: Run app using fleet
-        run: fleet run
+        run: fleet run --bin fleet
 
