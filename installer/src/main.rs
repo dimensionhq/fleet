@@ -66,17 +66,19 @@ fn main() {
         "macos" => {
             println!("💻 Installing for MacOS");
 
-            // Install zld, sccache
-            let status = Command::new("brew").arg("install").arg("michaeleisel/zld/zld").status();
-
-            if status.is_ok() {
-                println!("{}", "Installed zld".bright_green());
-            } else {
-                println!("{}", "Failed to install zld".bright_red());
-            }
+            println!(
+                "{}",
+                format!(
+                    "{} {} {} {} ",
+                    "Please ensure you have the following packages installed:",
+                    "zld\n".bright_cyan(),
+                    "brew:",
+                    "brew install michaeleisel/zld/zld".bright_yellow()
+                )
+            );
 
             set_compiler_nightly();
-	    install_sccache();
+            install_sccache();
             install_fleet();
 
             println!("{}", "Installation complete".bright_green());
@@ -84,27 +86,18 @@ fn main() {
         "linux" => {
             println!("💻 Installing for Linux");
 
-            println!("{}", "> sudo apt install lld clang".bright_cyan());
-
-            // Install lld, clang, sccache
-            let status = Command::new("sudo")
-                .arg("apt")
-                .arg("install")
-                .arg("lld")
-                .arg("clang")
-                .arg("-y")
-                .status()
-                .unwrap();
-
-            if status.success() {
-                println!(
-                    "{}{}",
-                    "Installed ".bright_green(),
-                    "lld, clang".bright_yellow()
-                );
-            } else {
-                println!("{}", "Failed to install lld, clang".bright_red());
-            }
+            println!(
+                "{}",
+                format!(
+                    "{} {} {} {} {} {}",
+                    "Please ensure you have the following packages installed:",
+                    "lld, clang\n".bright_cyan(),
+                    "Pacman:",
+                    "sudo pacman -S clang lld\n".bright_yellow(),
+                    "Apt:",
+                    "sudo apt install clang lld".bright_yellow()
+                )
+            );
 
             set_compiler_nightly();
             install_sccache();
