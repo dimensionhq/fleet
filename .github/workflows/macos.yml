@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-
             
       - name: Install sccache        
-        run: cargo install sccache
+        run:  if [ -e ~/.cargo/bin/sccache ] ; then echo "Sccache is already installed"; else cargo install sccache -f; fi
         
         
       - name: Install zld
