@@ -37,29 +37,14 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
             
-      - name: Cache /usr/local/Cellar
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: /usr/local/Cellar
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-            
       - name: Install sccache        
         run:  if [ -e ~/.cargo/bin/sccache ] ; then echo "Sccache is already installed"; else cargo install sccache -f; fi
         
-        
       - name: Install zld
-        run: if [ -e /usr/local/bin/zld ]; then brew link michaeleisel/zld/zld; else brew install michaeleisel/zld/zld
+        run: if [ -e /usr/local/bin/zld ]; then brew link zld; else brew install michaeleisel/zld/zld; fi
         
       - name: Install fleet
         run: cargo install --git https://github.com/dimensionhq/fleet fleet-rs --force
 
       - name: Run app using fleet
         run: fleet run --bin fleet
-
