@@ -55,7 +55,7 @@ jobs:
         
         
       - name: Install zld
-        run: brew install michaeleisel/zld/zld
+        run: if [ -e /usr/local/bin/zld ]; then brew link michaeleisel/zld/zld; else brew install michaeleisel/zld/zld
         
       - name: Install fleet
         run: cargo install --git https://github.com/dimensionhq/fleet fleet-rs --force
