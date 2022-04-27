@@ -54,18 +54,18 @@ pub struct Build {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct TartgetValues {
+pub struct TargetValues {
     pub rustflags: Vec<String>,
     pub linker: Option<String>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Target {
     #[serde(rename = "x86_64-unknown-linux-gnu")]
-    pub linux: TartgetValues,
+    pub linux: TargetValues,
     #[serde(rename = "x86_64-pc-windows-msvc")]
-    pub windows: TartgetValues,
+    pub windows: TargetValues,
     #[serde(rename = "x86_64-apple-darwin")]
-    pub mac: TartgetValues,
+    pub mac: TargetValues,
 }
 
 pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
@@ -74,7 +74,7 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
             rustc_wrapper: sccache_path.to_string(),
         },
         target: Target {
-            mac: TartgetValues {
+            mac: TargetValues {
                 rustflags: vec![
                     String::from("-C"),
                     String::from("link-arg=-fuse-ld=/usr/local/bin/zld"),
@@ -83,11 +83,11 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
                 ],
                 linker: None,
             },
-            windows: TartgetValues {
+            windows: TargetValues {
                 rustflags: vec![String::from("-Zshare-generics=y")],
                 linker: Some(String::from("rust-lld.exe")),
             },
-            linux: TartgetValues {
+            linux: TargetValues {
                 rustflags: vec![
                     String::from("-Clink-arg=-fuse-ld=lld"),
                     String::from("-Zshare-generics=y"),
