@@ -1,0 +1,16 @@
+[package]
+name = "cli"
+version = "0.0.9"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.17.0", features = ["full"] }
+colored = "2.0.0"
+thiserror = "1.0.30"
+anyhow = "1.0.57"
+serde = { version = "1.0", features = ["derive"] }
+toml_edit = "0.14.2"
+utils={path="../utils"}
+console="0.15.0"
