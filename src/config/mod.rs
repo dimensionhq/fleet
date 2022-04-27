@@ -52,14 +52,17 @@ impl FleetConfig {
     pub fn run_config(&self) -> Self {
         let cargo_home_path = std::env::var("CARGO_HOME");
         let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
+
         if let Ok(cargo_home) = cargo_home_path {
             cargo_path = PathBuf::from(cargo_home).join("bin");
         }
 
         let mut sccache_path = cargo_path.join("sccache");
-        if cfg!(windows){
+
+        if cfg!(windows) {
             sccache_path = cargo_path.join("sccache.exe");
         }
+
         if !sccache_path.exists() {
             println!(
                 "`{}` {} at {:?}, run {}",

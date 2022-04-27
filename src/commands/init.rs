@@ -15,16 +15,17 @@
  *    limitations under the License.
  */
 
-use crate::config::cargo::{self, add_rustc_wrapper_and_target_configs};
+use crate::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
     path::{self, PathBuf},
     process::{exit, Command},
 };
+
 #[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
-pub fn init(app: crate::cli::app::App) {
+pub fn enable_fleet(app: crate::cli::app::App) {
     let cargo_toml = path::Path::new("./Cargo.toml");
 
     if !cargo_toml.exists() {
@@ -59,6 +60,7 @@ pub fn init(app: crate::cli::app::App) {
     let config_file = toml::to_string(&config).unwrap();
 
     std::fs::write(config_path, config_file).unwrap();
+
     if os != "windows" {
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
         #[cfg(linux)]

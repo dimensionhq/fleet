@@ -17,9 +17,10 @@
 
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
+use colored::Colorize;
 use std::{env, path::PathBuf, process::exit};
 
-use crate::commands::init::init;
+use crate::commands::init::enable_fleet;
 
 use self::{
     app::App,
@@ -28,13 +29,18 @@ use self::{
 
 pub mod app;
 mod help;
+pub mod prompt;
 
 #[derive(Debug, Parser)]
 pub enum Command {
+    // Initialize a Fleet project
+    Init,
     /// Run a Fleet project
     Run,
     /// Build a Fleet project
     Build,
+    /// Configure a Fleet project
+    Configure,
 }
 
 #[derive(Debug, Parser)]
@@ -146,7 +152,8 @@ The blazing fast build tool for Rust.
 
 {}:
     build    Build a Fleet project
-    run      Run a Fleet project"#,
+    run      Run a Fleet project
+    configure Configure a Fleet project"#,
             Green.paint("fleet"),
             env!("CARGO_PKG_VERSION"),
             Yellow.paint("USAGE"),
@@ -184,12 +191,14 @@ The blazing fast build tool for Rust.
 
             if args.contains(&String::from("--update-path")) || args.contains(&String::from("-up"))
             {
-                init(app);
+                enable_fleet(app);
                 std::process::exit(1)
             }
+
             match cmd.as_str() {
                 "run" => {
-                    init(app);
+                    enable_fleet(app);
+
                     // get all args after the subcommand
                     let args: Vec<String> = args.iter().skip(2).map(|s| s.to_string()).collect();
                     // Run the crate
@@ -204,7 +213,7 @@ The blazing fast build tool for Rust.
                     }
                 }
                 "build" => {
-                    init(app);
+                    enable_fleet(app);
 
                     let args: Vec<String> = args.iter().skip(2).map(|s| s.to_string()).collect();
 
@@ -217,6 +226,25 @@ The blazing fast build tool for Rust.
                     if !status.success() {
                         CLI::handle_failure();
                     }
+                }
+                "configure" => {
+                    let prompt = format!("Select a {}:", "Linker".bright_cyan());
+
+                    let select = prompt::prompts::Select {
+                        message: std::borrow::Cow::Borrowed(prompt.as_str()),
+                        paged: false,
+                        selected: None,
+                        items: vec![
+                            std::borrow::Cow::Borrowed("lld"),
+                            std::borrow::Cow::Borrowed("mold"),
+                        ],
+                    };
+
+                    let linker_selected = match select.run().unwrap() {
+                        0 => "lld",
+                        1 => "mold",
+                        _ => "",
+                    };
                 }
                 _ => {}
             }
