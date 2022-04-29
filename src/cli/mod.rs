@@ -170,6 +170,10 @@ The blazing fast build tool for Rust.
     }
 
     pub fn run() {
+        if cfg!(windows) {
+            let _ = ansi_term::enable_ansi_support();
+        }
+
         let args = std::env::args().collect::<Vec<String>>();
         let app = App::new();
 

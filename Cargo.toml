@@ -47,7 +47,7 @@ version = "0.5.8"
 features = ["preserve_order"]
 
 [dependencies.uuid]
-version = "0.8"
+version = "1.0.0"
 features = ["serde", "v4"]
 
 [profile.dev]
