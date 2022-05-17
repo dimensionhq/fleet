@@ -32,6 +32,7 @@ sysinfo = "0.23.10"
 rustc_version = "0.4.0"
 dialoguer = "0.10.0"
 colored = "2.0.0"
+sys-info = "0.9.1"
 
 [dependencies.clap]
 version = "3.1.8"

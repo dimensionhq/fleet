@@ -22,6 +22,10 @@ pub fn install_linker(linker: &str) {
                     "sudo apt install clang lld".bright_yellow()
                 );
 
+                // TODO: allow for user confirmation on whether or not they want to run the command
+                // TODO: add distro support
+                println!("{:?}", sys_info::linux_os_release());
+
                 let result = std::process::Command::new("bash")
                     .arg("-c")
                     .arg("sudo apt install clang lld")
@@ -41,6 +45,7 @@ pub fn install_linker(linker: &str) {
                     "brew install michaeleisel/zld/zld".bright_yellow()
                 );
 
+                // TODO: allow for user confirmation on whether or not they want to run the command
                 // Spawn the command
                 let result = std::process::Command::new("bash")
                     .arg("-c")
@@ -60,6 +65,7 @@ pub fn install_linker(linker: &str) {
                     "sudo apt install clang lld".bright_yellow()
                 );
 
+                // TODO: allow for user confirmation on whether or not they want to run the command
                 let result = std::process::Command::new("bash")
                     .arg("-c")
                     .arg("sudo apt install clang lld")
