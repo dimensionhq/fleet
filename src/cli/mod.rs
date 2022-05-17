@@ -234,21 +234,50 @@ The blazing fast build tool for Rust.
                 "configure" => {
                     let prompt = format!("Select a {}:", "Linker".bright_cyan());
 
+                    let linker_options = match std::env::consts::OS {
+                        "windows" => {
+                            vec![std::borrow::Cow::Owned(format!(
+                                "🚄 lld - {} faster",
+                                "4x".bright_cyan()
+                            ))]
+                        }
+                        "macos" => {
+                            vec![
+                                std::borrow::Cow::Owned(format!(
+                                    "🚀 zld - {} faster",
+                                    "6x".bright_cyan()
+                                )),
+                                std::borrow::Cow::Owned(format!(
+                                    "🚄 lld - {} faster",
+                                    "4x".bright_cyan()
+                                )),
+                            ]
+                        }
+                        "linux" => {
+                            vec![
+                                std::borrow::Cow::Owned(format!(
+                                    "🚀 mold - {} faster",
+                                    "20x".bright_cyan()
+                                )),
+                                std::borrow::Cow::Owned(format!(
+                                    "🚄 lld - {} faster",
+                                    "5x".bright_cyan()
+                                )),
+                            ]
+                        }
+                        &_ => Vec::new(),
+                    };
+
                     let select = prompt::prompts::Select {
                         message: std::borrow::Cow::Borrowed(prompt.as_str()),
                         paged: false,
                         selected: None,
-                        items: vec![
-                            std::borrow::Cow::Borrowed("lld"),
-                            std::borrow::Cow::Borrowed("mold"),
-                        ],
+                        items: linker_options.clone(),
                     };
 
-                    let linker_selected = match select.run().unwrap() {
-                        0 => "lld",
-                        1 => "mold",
-                        _ => "",
-                    };
+                    let linker_selected = linker_options[select.run().unwrap()].to_string();
+
+                    crate::utils::configure::install_linker(&linker_selected);
                 }
                 _ => {}
             }

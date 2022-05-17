@@ -20,6 +20,7 @@ use cli::CLI;
 pub mod cli;
 pub mod commands;
 pub mod config;
+pub mod utils;
 
 fn main() {
     let _ = CLI::run();
