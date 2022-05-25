@@ -80,6 +80,8 @@ pub struct Input<'i> {
 }
 
 impl Input<'_> {
+    /// # Panics
+    /// Can panic if cannot get self.default as ref
     pub fn run(&self) -> Result<String> {
         let theme = ColorfulTheme {
             defaults_style: console::Style::new(),
@@ -110,7 +112,7 @@ impl Input<'_> {
             .allow_empty(self.allow_empty);
 
         if self.default.is_some() {
-            input.default(self.default.as_ref().unwrap().to_string());
+            input.default(self.default.as_ref().expect("cannot get self.default asref").to_string());
         }
 
         let value = input.interact_text()?;
@@ -206,8 +208,9 @@ impl<'i> Select<'i> {
             .with_prompt(self.message.clone())
             //.paged(self.paged)
             .items(&self.items);
-        if self.selected.is_some() {
-            input.default(self.selected.unwrap() - 1);
+
+        if let Some(selected) = self.selected {
+            input.default(selected - 1);
         }
 
         input.interact()

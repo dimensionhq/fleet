@@ -68,6 +68,8 @@ pub struct Target {
     pub mac: TargetValues,
 }
 
+/// # Panics
+/// Can panic if cannot prettify config
 pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
     let config: ConfigToml = ConfigToml {
         build: Build {
@@ -114,7 +116,7 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
         },
     };
 
-    let toml_string = toml::to_string_pretty(&config).unwrap();
+    let toml_string = toml::to_string_pretty(&config).expect("Cannot prettify config");
 
     std::fs::write(path, toml_string).unwrap_or_else(|err| {
         println!(
@@ -126,5 +128,5 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
         exit(1);
     });
 
-    println!("📝 Generated Fleet Config")
+    println!("📝 Generated Fleet Config");
 }

@@ -257,6 +257,7 @@ where
     T::Err: Display + Debug,
 {
     /// Creates an input prompt.
+    #[must_use]
     pub fn new() -> Input<'a, T> {
         Input::with_theme(&SimpleTheme)
     }
@@ -367,6 +368,9 @@ where
     }
 
     /// Like [`interact_text`](#method.interact_text) but allows a specific terminal to be set.
+    ///
+    /// # Panics
+    /// If the terminal is not a tty
     pub fn interact_text_on(&mut self, term: &Term) -> io::Result<T> {
         let mut render = TermThemeRenderer::new(term, self.theme);
 
@@ -385,7 +389,7 @@ where
 
             // Read input by keystroke so that we can suppress ascii control characters
             if !term.features().is_attended() {
-                return Ok("".to_owned().parse::<T>().unwrap());
+                return Ok("".to_owned().parse::<T>().expect("Terminal is not a tty"));
             }
 
             let mut chars: Vec<char> = Vec::new();

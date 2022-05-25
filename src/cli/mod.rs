@@ -58,10 +58,11 @@ pub struct CLI {
 }
 
 impl CLI {
-    // pub fn parse()
+    /// # Panics
+    /// Can panic if unable to access rust version meta
     pub fn handle_failure() {
         // check if it's a configuration issue
-        match rustc_version::version_meta().unwrap().channel {
+        match rustc_version::version_meta().expect("Unable to see rust version meta").channel {
             rustc_version::Channel::Nightly => {
                 // no issues here
             }
@@ -162,14 +163,18 @@ The blazing fast build tool for Rust.
         );
 
         if cmd == "run" {
-            help_menu = build_run_help_message()
+            help_menu = build_run_help_message();
         } else if cmd == "build" {
-            help_menu = build_build_help_message()
+            help_menu = build_build_help_message();
         }
-        println!("{}", help_menu)
+        println!("{}", help_menu);
     }
 
+    /// # Panics
+    /// Can panic if unable to cargo run
     pub fn run() {
+        const VERSION: &str = env!("CARGO_PKG_VERSION");
+
         #[cfg(windows)]
         let _ = ansi_term::enable_ansi_support();
 
@@ -185,7 +190,6 @@ The blazing fast build tool for Rust.
                 CLI::display_help(cmd);
                 std::process::exit(1)
             }
-            const VERSION: &str = env!("CARGO_PKG_VERSION");
 
             if args.contains(&String::from("--version")) || args.contains(&String::from("-v")) {
                 println!("{}", VERSION);
@@ -203,13 +207,13 @@ The blazing fast build tool for Rust.
                     enable_fleet(app);
 
                     // get all args after the subcommand
-                    let args: Vec<String> = args.iter().skip(2).map(|s| s.to_string()).collect();
+                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
                     // Run the crate
                     let status = std::process::Command::new("cargo")
                         .arg("run")
                         .args(args)
                         .status()
-                        .unwrap();
+                        .expect("Unable to cargo run");
 
                     if !status.success() {
                         CLI::handle_failure();
@@ -218,7 +222,7 @@ The blazing fast build tool for Rust.
                 "build" => {
                     enable_fleet(app);
 
-                    let args: Vec<String> = args.iter().skip(2).map(|s| s.to_string()).collect();
+                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
 
                     let status = std::process::Command::new("cargo")
                         .arg("build")
