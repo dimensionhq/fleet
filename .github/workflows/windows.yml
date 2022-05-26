@@ -30,7 +30,7 @@ jobs:
         run: if (Test-Path -Path ~\.cargo\bin\sccache.exe -PathType Leaf) {echo "Sccache is already installed"} else { cargo install sccache -f }
 
       - name: Install fleet
-        run: if (Test-Path -Path ~\.cargo\bin\fleet.exe -PathType Leaf) {echo "Fleet is already installed"} else { cargo install --path . fleet-rs -f }
+        run: cargo install --path . fleet-rs -f
 
       - name: Run app using fleet
         run: fleet build --bin fleet
