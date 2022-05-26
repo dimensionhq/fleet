@@ -1,4 +1,4 @@
-name: Rust
+name: Macos Builds
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
         run: if [ -e /usr/local/bin/zld ]; then brew link zld; else brew install michaeleisel/zld/zld; fi
         
       - name: Install fleet
-        run: cargo install --git https://github.com/dimensionhq/fleet fleet-rs --force
+        run: cargo install --path . fleet-rs -f
 
       - name: Run app using fleet
         run: fleet run --bin fleet
