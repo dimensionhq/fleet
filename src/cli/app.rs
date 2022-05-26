@@ -31,14 +31,21 @@ impl Default for App {
 }
 
 impl App {
-    pub fn new() -> Self {
-        let current_dir = current_dir().unwrap();
-        let config = FleetConfig::new();
-        // check
-        let config = config.run_config();
 
+    ///Creates a new app
+    ///
+    /// # Panics
+    /// Can panic if current directory is not found (eg. doesn't exist or invalid perms)
+    #[must_use]
+    pub fn new() -> Self {
+        let current_dir = current_dir().expect("Unable to find current directory for app!");
+        // let config = FleetConfig::new();
+        // check
+        // let config = config.run_config();
+
+        //wasn't using the self argument anyway, so unsure of use
         Self {
-            config,
+            config: FleetConfig::run_config(),
             current_dir,
         }
     }

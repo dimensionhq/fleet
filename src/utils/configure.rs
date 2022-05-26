@@ -2,6 +2,8 @@ use std::env::consts::OS;
 
 use colored::Colorize;
 
+/// # Panics
+/// Can panic if unable to install clang and lld
 pub fn install_linker(linker: &str) {
     match OS {
         "windows" => {
@@ -30,7 +32,7 @@ pub fn install_linker(linker: &str) {
                     .arg("-c")
                     .arg("sudo apt install clang lld")
                     .status()
-                    .unwrap();
+                    .expect("Failed to install clang + lld");
 
                 if result.success() {
                     println!("🚄 lld {}", "enabled".bright_green());

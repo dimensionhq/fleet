@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#![warn(clippy::all)]
+#![warn(clippy::pedantic)]
+#![allow(clippy::missing_errors_doc, clippy::module_name_repetitions)]
 
 use cli::CLI;
 
@@ -23,5 +26,5 @@ pub mod config;
 pub mod utils;
 
 fn main() {
-    let _ = CLI::run();
+    CLI::run();
 }

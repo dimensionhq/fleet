@@ -39,6 +39,7 @@ impl Default for FleetConfig {
 }
 
 impl FleetConfig {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             rd_enabled: false,
@@ -49,7 +50,10 @@ impl FleetConfig {
         }
     }
 
-    pub fn run_config(&self) -> Self {
+    /// # Panics
+    /// Can panic if cannot find home directory
+    #[must_use]
+    pub fn run_config() -> Self {
         let cargo_home_path = std::env::var("CARGO_HOME");
         let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
 
@@ -73,14 +77,14 @@ impl FleetConfig {
             );
         }
 
-        let config_path = std::env::current_dir().unwrap().join("fleet.toml");
+        let config_path = std::env::current_dir().expect("cannot find current directory").join("fleet.toml");
 
         if config_path.exists() {
             let config_file = std::fs::read_to_string(config_path).unwrap();
             let config = toml::from_str::<Self>(&config_file);
 
             if let Ok(mut config) = config {
-                self.update_sccache(&mut config, sccache_path);
+                config.update_sccache(&sccache_path);
                 config
             } else {
                 println!("Invalid fleet configuration");
@@ -100,23 +104,20 @@ impl FleetConfig {
         }
     }
 
-    fn update_sccache(&self, config: &mut Self, sccache_path: PathBuf) -> Self {
+    fn update_sccache(&mut self, sccache_path: &PathBuf) -> Self {
         let home_dir = dirs::home_dir().unwrap();
 
-        if config.build.sccache != sccache_path {
+        if &self.build.sccache == sccache_path {
             let sccache_path = std::path::Path::new(&home_dir)
                 .join(".cargo")
                 .join("bin")
                 .join("sccache");
 
-            config.build.sccache = sccache_path;
+            self.build.sccache = sccache_path;
             let config_path = std::env::current_dir().unwrap().join("fleet.toml");
-            let config_file = toml::to_string(&config).unwrap();
+            let config_file = toml::to_string(&self).unwrap();
             std::fs::write(config_path, config_file).unwrap();
-
-            config.clone()
-        } else {
-            config.clone()
         }
+        self.clone()
     }
 }

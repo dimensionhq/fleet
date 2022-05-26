@@ -25,6 +25,8 @@ use std::{
 #[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
+/// # Panics
+/// Can panic if cannot get `dirs::home_dir`
 pub fn enable_fleet(app: crate::cli::app::App) {
     let cargo_toml = path::Path::new("./Cargo.toml");
 
@@ -39,7 +41,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
     let os = std::env::consts::OS;
 
     let path = std::env::var("CARGO_HOME");
-    let mut cargo_path = dirs::home_dir().unwrap();
+    let mut cargo_path = dirs::home_dir().expect("Cannot get home dir for cargo path");
 
     match path {
         Ok(p) => {
@@ -63,7 +65,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
 
     if os != "windows" {
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
-        #[cfg(linux)]
+        #[cfg(target_os = "linux")]
         {
             let refresh_kind = RefreshKind::new();
             let disks = refresh_kind.with_disks_list();
