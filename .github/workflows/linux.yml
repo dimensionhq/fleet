@@ -1,4 +1,4 @@
-name: Rust
+name: Linux Builds
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
         run: if [ -e ~/.cargo/bin/sccache ] ; then echo "Sccache is already installed"; else cargo install sccache -f; fi
 
       - name: Install fleet
-        run: if [ -e ~/.cargo/bin/fleet ] ; then echo "Fleet is already installed"; else cargo install fleet-rs -f; fi
+        run: cargo install --path . fleet-rs -f
 
       - name: Run app using fleet
         run: fleet build --bin fleet
