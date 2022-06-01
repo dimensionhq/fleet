@@ -1,7 +1,4 @@
 rd_enabled = true
-fleet_id = "d7e98b42-deb7-493e-a238-95f0fcbd991f"
+fleet_id = "f06aecbb-9950-4a4c-869f-c9029d449019"
 
 [build]
-sccache = "C:\\Users\\shivs\\.cargo\\bin\\sccache.exe"
-lld = "rust-lld.exe"
-clang = "user/bin/clang"

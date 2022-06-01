@@ -16,15 +16,17 @@
  */
 
 pub mod cargo;
+pub mod global;
 use ansi_term::Colour::{Cyan, Yellow};
+use global::FleetGlobalConfig;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::exit};
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
-    pub sccache: PathBuf,
-    pub lld: PathBuf,
-    pub clang: PathBuf,
+    pub sccache: Option<PathBuf>,
+    pub lld: Option<PathBuf>,
+    pub clang: Option<PathBuf>,
 }
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
@@ -47,9 +49,9 @@ impl FleetConfig {
             rd_enabled: false,
             fleet_id: String::from(""),
             build: Build {
-                sccache: PathBuf::from("~/.cargo/bin/sccache"),
-                lld: PathBuf::from("rust-lld.exe"),
-                clang: PathBuf::from("user/bin/clang"),
+                sccache: None,
+                lld: None,
+                clang: None,
             },
         }
     }
@@ -60,6 +62,8 @@ impl FleetConfig {
     pub fn run_config() -> Self {
         let cargo_home_path = std::env::var("CARGO_HOME");
         let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
+
+        let global_config = FleetGlobalConfig::run_config();
 
         if let Ok(cargo_home) = cargo_home_path {
             cargo_path = PathBuf::from(cargo_home).join("bin");
@@ -87,11 +91,38 @@ impl FleetConfig {
 
         if config_path.exists() {
             let config_file = std::fs::read_to_string(config_path).unwrap();
-            println!("{}", config_file);
             let config = toml::from_str::<Self>(&config_file);
 
             if let Ok(mut config) = config {
-                config.update_sccache(&sccache_path);
+                config.build.sccache = Some(
+                    config
+                        .build
+                        .sccache
+                        .as_ref()
+                        .unwrap_or(&global_config.build.sccache)
+                        .clone(),
+                );
+
+                config.build.lld = Some(
+                    config
+                        .build
+                        .lld
+                        .as_ref()
+                        .unwrap_or(&global_config.build.lld)
+                        .clone()
+                );
+
+                config.build.clang = Some(
+                    config
+                        .build
+                        .clang
+                        .as_ref()
+                        .unwrap_or(&global_config.build.clang)
+                        .clone()
+                );
+                // todo: use global variable to update path of sccache, lld and clang on everytime
+                // config.update_sccache(&sccache_path);
+
                 config
             } else {
                 println!("Invalid fleet configuration");
@@ -102,9 +133,9 @@ impl FleetConfig {
                 rd_enabled: true,
                 fleet_id: uuid::Uuid::new_v4().to_string(),
                 build: Build {
-                    sccache: sccache_path,
-                    lld: PathBuf::from("rust-lld.exe"),
-                    clang: PathBuf::from("user/bin/clang"),
+                    sccache: None,
+                    lld: None,
+                    clang: None,
                 },
             };
             let config_file = toml::to_string(&config).unwrap();
@@ -113,16 +144,17 @@ impl FleetConfig {
         }
     }
 
+    #[allow(unused)]
     fn update_sccache(&mut self, sccache_path: &PathBuf) -> Self {
         let home_dir = dirs::home_dir().unwrap();
 
-        if &self.build.sccache == sccache_path {
+        if &(self.build.sccache.clone().unwrap()) == sccache_path {
             let sccache_path = std::path::Path::new(&home_dir)
                 .join(".cargo")
                 .join("bin")
                 .join("sccache");
 
-            self.build.sccache = sccache_path;
+            self.build.sccache = Some(sccache_path);
             let config_path = std::env::current_dir().unwrap().join("fleet.toml");
             let config_file = toml::to_string(&self).unwrap();
             std::fs::write(config_path, config_file).unwrap();

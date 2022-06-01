@@ -108,9 +108,9 @@ pub fn enable_fleet(app: crate::cli::app::App) {
         } else {
             config_no_toml.to_str().unwrap()
         },
-        config.build.sccache.to_str().unwrap(),
-        config.build.clang.to_str().unwrap(),
-        config.build.lld.to_str().unwrap(),
+        config.build.sccache.unwrap().to_str().unwrap(),
+        config.build.clang.unwrap().to_str().unwrap(),
+        config.build.lld.unwrap().to_str().unwrap(),
     );
 
     println!("🚀 {}", Green.paint("Fleet is ready!"));
