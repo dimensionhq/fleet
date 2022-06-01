@@ -70,7 +70,12 @@ pub struct Target {
 
 /// # Panics
 /// Can panic if cannot prettify config
-pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
+pub fn add_rustc_wrapper_and_target_configs(
+    path: &str,
+    sccache_path: &str,
+    clang_path: &str,
+    lld_path: &str,
+) {
     let config: ConfigToml = ConfigToml {
         build: Build {
             rustc_wrapper: sccache_path.to_string(),
@@ -87,14 +92,14 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
             },
             windows: TargetValues {
                 rustflags: vec![String::from("-Zshare-generics=y")],
-                linker: Some(String::from("rust-lld.exe")),
+                linker: Some(lld_path.to_string()),
             },
             linux: TargetValues {
                 rustflags: vec![
                     String::from("-Clink-arg=-fuse-ld=lld"),
                     String::from("-Zshare-generics=y"),
                 ],
-                linker: Some(String::from("/usr/bin/clang")),
+                linker: Some(clang_path.to_string()),
             },
         },
         profile: Profile {

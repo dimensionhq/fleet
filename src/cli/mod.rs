@@ -62,7 +62,10 @@ impl CLI {
     /// Can panic if unable to access rust version meta
     pub fn handle_failure() {
         // check if it's a configuration issue
-        match rustc_version::version_meta().expect("Unable to see rust version meta").channel {
+        match rustc_version::version_meta()
+            .expect("Unable to see rust version meta")
+            .channel
+        {
             rustc_version::Channel::Nightly => {
                 // no issues here
             }
@@ -207,7 +210,11 @@ The blazing fast build tool for Rust.
                     enable_fleet(app);
 
                     // get all args after the subcommand
-                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
+                    let args: Vec<String> = args
+                        .iter()
+                        .skip(2)
+                        .map(std::string::ToString::to_string)
+                        .collect();
                     // Run the crate
                     let status = std::process::Command::new("cargo")
                         .arg("run")
@@ -222,7 +229,11 @@ The blazing fast build tool for Rust.
                 "build" => {
                     enable_fleet(app);
 
-                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
+                    let args: Vec<String> = args
+                        .iter()
+                        .skip(2)
+                        .map(std::string::ToString::to_string)
+                        .collect();
 
                     let status = std::process::Command::new("cargo")
                         .arg("build")

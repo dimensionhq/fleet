@@ -112,7 +112,12 @@ impl Input<'_> {
             .allow_empty(self.allow_empty);
 
         if self.default.is_some() {
-            input.default(self.default.as_ref().expect("cannot get self.default asref").to_string());
+            input.default(
+                self.default
+                    .as_ref()
+                    .expect("cannot get self.default asref")
+                    .to_string(),
+            );
         }
 
         let value = input.interact_text()?;

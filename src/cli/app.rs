@@ -31,7 +31,6 @@ impl Default for App {
 }
 
 impl App {
-
     ///Creates a new app
     ///
     /// # Panics

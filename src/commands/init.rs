@@ -18,7 +18,7 @@
 use crate::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
-    path::{self, PathBuf},
+    path,
     process::{exit, Command},
 };
 
@@ -37,25 +37,8 @@ pub fn enable_fleet(app: crate::cli::app::App) {
         }
     }
 
-    let mut config = app.config;
+    let config = app.config;
     let os = std::env::consts::OS;
-
-    let path = std::env::var("CARGO_HOME");
-    let mut cargo_path = dirs::home_dir().expect("Cannot get home dir for cargo path");
-
-    match path {
-        Ok(p) => {
-            cargo_path = PathBuf::from(p).join("bin");
-        }
-        Err(_) => cargo_path = cargo_path.join(".cargo").join("bin"),
-    }
-
-    let mut sccache_path = cargo_path.join("sccache");
-
-    if cfg!(windows) {
-        sccache_path = cargo_path.join("sccache.exe");
-    }
-    config.build.sccache = sccache_path;
 
     let config_path = std::env::current_dir().unwrap().join("fleet.toml");
 
@@ -126,6 +109,8 @@ pub fn enable_fleet(app: crate::cli::app::App) {
             config_no_toml.to_str().unwrap()
         },
         config.build.sccache.to_str().unwrap(),
+        config.build.clang.to_str().unwrap(),
+        config.build.lld.to_str().unwrap(),
     );
 
     println!("🚀 {}", Green.paint("Fleet is ready!"));

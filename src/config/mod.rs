@@ -23,6 +23,8 @@ use std::{path::PathBuf, process::exit};
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
     pub sccache: PathBuf,
+    pub lld: PathBuf,
+    pub clang: PathBuf,
 }
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
@@ -46,6 +48,8 @@ impl FleetConfig {
             fleet_id: String::from(""),
             build: Build {
                 sccache: PathBuf::from("~/.cargo/bin/sccache"),
+                lld: PathBuf::from("rust-lld.exe"),
+                clang: PathBuf::from("user/bin/clang"),
             },
         }
     }
@@ -77,10 +81,13 @@ impl FleetConfig {
             );
         }
 
-        let config_path = std::env::current_dir().expect("cannot find current directory").join("fleet.toml");
+        let config_path = std::env::current_dir()
+            .expect("cannot find current directory")
+            .join("fleet.toml");
 
         if config_path.exists() {
             let config_file = std::fs::read_to_string(config_path).unwrap();
+            println!("{}", config_file);
             let config = toml::from_str::<Self>(&config_file);
 
             if let Ok(mut config) = config {
@@ -96,6 +103,8 @@ impl FleetConfig {
                 fleet_id: uuid::Uuid::new_v4().to_string(),
                 build: Build {
                     sccache: sccache_path,
+                    lld: PathBuf::from("rust-lld.exe"),
+                    clang: PathBuf::from("user/bin/clang"),
                 },
             };
             let config_file = toml::to_string(&config).unwrap();
