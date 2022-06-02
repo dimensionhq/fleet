@@ -18,9 +18,12 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
-use std::{env, path::PathBuf, process::exit, fs};
+use std::{env, fs, path::PathBuf, process::exit};
 
-use crate::{commands::init::enable_fleet, config::global::FleetGlobalConfig};
+use crate::{
+    commands::init::enable_fleet,
+    config::{find, global::FleetGlobalConfig},
+};
 
 use self::{
     app::App,
@@ -39,6 +42,8 @@ pub enum Command {
     Run,
     /// Build a Fleet project
     Build,
+    /// Repair a Fleet project
+    Repair,
     /// Configure a Fleet project
     Configure,
 }
@@ -65,9 +70,7 @@ impl CLI {
             .expect("Unable to see rust version meta")
             .channel
         {
-            rustc_version::Channel::Nightly => {
-                // no issues here
-            }
+            rustc_version::Channel::Nightly => {} // no issues here
             _ => {
                 eprintln!(
                     "{} You are not using a {} compiler. Run {}.",
@@ -78,19 +81,9 @@ impl CLI {
             }
         }
 
-        let cargo_home_path = std::env::var("CARGO_HOME");
-        let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
-        if let Ok(cargo_home) = cargo_home_path {
-            cargo_path = PathBuf::from(cargo_home).join("bin");
-        }
+        let sccache_path = find("sccache");
 
-        // check if sccache is installed
-        let mut sccache_path = cargo_path.join("sccache");
-        if cfg!(windows) {
-            sccache_path = cargo_path.join("sccache.exe");
-        }
-
-        if !sccache_path.exists() {
+        if sccache_path.is_none() {
             eprintln!(
                 "{} You have not installed {}. Run {}.",
                 Yellow.paint("=>"),
@@ -101,9 +94,9 @@ impl CLI {
 
         // check if lld is available (on linux) and zld on macos
         if cfg!(linux) {
-            let lld_path = std::path::Path::new("/usr/bin/lld");
+            let lld_path = find("lld");
 
-            if !lld_path.exists() {
+            if lld_path.is_none() {
                 println!(
                     "{} You have not installed {}. Run {}.",
                     Yellow.paint("=>"),
@@ -113,9 +106,9 @@ impl CLI {
             }
 
             // check if clang is available
-            let clang_path = std::path::Path::new("/usr/bin/clang");
+            let clang_path = find("clang");
 
-            if !clang_path.exists() {
+            if clang_path.is_none() {
                 eprintln!(
                     "{} You have not installed {}. Run {}.",
                     Yellow.paint("=>"),
@@ -124,9 +117,9 @@ impl CLI {
                 );
             }
         } else if cfg!(macos) {
-            let zld_path = std::path::Path::new("/usr/bin/zld");
+            let zld_path = find("zld");
 
-            if !zld_path.exists() {
+            if zld_path.is_none() {
                 eprintln!(
                     "{} You have not installed {}. Run {}.",
                     Yellow.paint("=>"),
@@ -251,19 +244,12 @@ The blazing fast build tool for Rust.
                     let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
                     let config_file = config_dir.join("config.toml");
 
-
-                    if !config_dir.exists() || !config_file.exists(){
+                    if !config_dir.exists() || !config_file.exists() {
                         FleetGlobalConfig::run_config();
-                    }else{
+                    } else {
                         fs::remove_file(config_file).expect("Failed to delete file");
                         FleetGlobalConfig::run_config();
                     }
-
-
-
-
-                    
-
                 }
                 "configure" => {
                     let prompt = format!("Select a {}:", "Linker".bright_cyan());

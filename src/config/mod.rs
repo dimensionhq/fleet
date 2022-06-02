@@ -21,6 +21,16 @@ pub mod global;
 use global::FleetGlobalConfig;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::exit};
+use which::which;
+
+#[must_use]
+pub fn find(bin: &str) -> Option<PathBuf> {
+    if let Ok(path) = which(bin) {
+        Some(path)
+    } else {
+        None
+    }
+}
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {

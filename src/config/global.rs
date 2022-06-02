@@ -15,19 +15,13 @@
  *    limitations under the License.
  */
 
+use crate::config::find;
 use serde::{Deserialize, Serialize};
-use std::{fs, path::PathBuf, process::exit};
-use which::which;
-
-#[must_use]
-pub fn find(bin: &str) -> Option<PathBuf> {
-    if let Ok(path) = which(bin) {
-        Some(path)
-    } else {
-        None
-    }
-}
-
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::exit,
+};
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
     pub sccache: Option<PathBuf>,
@@ -43,6 +37,7 @@ pub struct FleetGlobalConfig {
 impl FleetGlobalConfig {
     /// # Panics
     /// can panic if home dir not found
+    #[must_use]
     pub fn run_config() -> Self {
         let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
 
@@ -56,7 +51,7 @@ impl FleetGlobalConfig {
             let config_file = fs::read_to_string(&config_path).unwrap();
             if let Ok(config) = toml::from_str::<Self>(&config_file) {
                 return config;
-            }else {
+            } else {
                 println!("Invalid fleet global configuration");
                 exit(1)
             }
@@ -65,7 +60,7 @@ impl FleetGlobalConfig {
         let config = FleetGlobalConfig {
             build: Build {
                 sccache: find("sccache"),
-                lld: find("rust-lld.exe"),
+                lld: Some(PathBuf::from("rust-lld.exe")),
                 clang: find("clang"),
             },
         };
