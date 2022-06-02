@@ -18,12 +18,9 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
-use std::{env, fs, process::exit};
+use std::{borrow::Cow, env, process::exit};
 
-use crate::{
-    commands::init::enable_fleet,
-    config::{find, global::FleetGlobalConfig},
-};
+use crate::{commands::{init::enable_fleet, doctor::run_doctor}, config::find};
 
 use self::{
     app::App,
@@ -43,7 +40,7 @@ pub enum Command {
     /// Build a Fleet project
     Build,
     /// Repair a Fleet project
-    Repair,
+    Doctor,
     /// Configure a Fleet project
     Configure,
 }
@@ -150,7 +147,7 @@ The blazing fast build tool for Rust.
     build    Build a Fleet project
     run      Run a Fleet project
     configure Configure a Fleet project
-    repair   Fix the binary path for the all dependencies used"#,
+    Doctor   Repair a Fleet project"#,
             Green.paint("fleet"),
             env!("CARGO_PKG_VERSION"),
             Yellow.paint("USAGE"),
@@ -238,59 +235,51 @@ The blazing fast build tool for Rust.
                         CLI::handle_failure();
                     }
                 }
-                "repair" => {
-                    enable_fleet(app);
+                "doctor" => {
+                    let prompt = format!("🚑 Repair your Fleet project");
 
-                    let config_file = dirs::home_dir()
-                        .unwrap()
-                        .join(".config")
-                        .join("fleet")
-                        .join("config.toml");
+                    let options = vec![
+                        Cow::Borrowed("Fix dependencies"),
+                        Cow::Borrowed("Regenerate local fleet setup"),
+                    ];
 
-                    if config_file.exists() {
-                        fs::remove_file(config_file).expect("Failed to delete file");
-                    }
-                    FleetGlobalConfig::run_config();
+                    let select = prompt::prompts::Select {
+                        message: std::borrow::Cow::Borrowed(prompt.as_str()),
+                        paged: false,
+                        selected: None,
+                        items: options.clone(),
+                    };
+
+                    let selected = options[select.run().unwrap()].to_string();
+                    run_doctor(&selected, app);
                 }
                 "configure" => {
                     let prompt = format!("Select a {}:", "Linker".bright_cyan());
 
                     let linker_options = match std::env::consts::OS {
                         "windows" => {
-                            vec![std::borrow::Cow::Owned(format!(
+                            vec![Cow::Owned(format!(
                                 "🚄 lld - {} faster",
                                 "4x".bright_cyan()
                             ))]
                         }
                         "macos" => {
                             vec![
-                                std::borrow::Cow::Owned(format!(
-                                    "🚀 zld - {} faster",
-                                    "6x".bright_cyan()
-                                )),
-                                std::borrow::Cow::Owned(format!(
-                                    "🚄 lld - {} faster",
-                                    "4x".bright_cyan()
-                                )),
+                                Cow::Owned(format!("🚀 zld - {} faster", "6x".bright_cyan())),
+                                Cow::Owned(format!("🚄 lld - {} faster", "4x".bright_cyan())),
                             ]
                         }
                         "linux" => {
                             vec![
-                                std::borrow::Cow::Owned(format!(
-                                    "🚀 mold - {} faster",
-                                    "20x".bright_cyan()
-                                )),
-                                std::borrow::Cow::Owned(format!(
-                                    "🚄 lld - {} faster",
-                                    "5x".bright_cyan()
-                                )),
+                                Cow::Owned(format!("🚀 mold - {} faster", "20x".bright_cyan())),
+                                Cow::Owned(format!("🚄 lld - {} faster", "5x".bright_cyan())),
                             ]
                         }
                         &_ => Vec::new(),
                     };
 
                     let select = prompt::prompts::Select {
-                        message: std::borrow::Cow::Borrowed(prompt.as_str()),
+                        message: Cow::Borrowed(prompt.as_str()),
                         paged: false,
                         selected: None,
                         items: linker_options.clone(),

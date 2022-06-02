@@ -70,7 +70,6 @@ impl FleetConfig {
 
     /// # Panics
     /// Can panic if cannot find home directory
-    #[must_use]
     pub fn run_config() -> Self {
         let global_config = FleetGlobalConfig::run_config();
 
