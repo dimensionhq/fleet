@@ -124,7 +124,7 @@ pub fn add_rustc_wrapper_and_target_configs(
     let toml_string = toml::to_string_pretty(&config).expect("Cannot prettify config");
 
     std::fs::write(path, toml_string).unwrap_or_else(|err| {
-        println!(
+        eprintln!(
             "{}: failed to write configuration: {}",
             Red.paint("error"),
             err

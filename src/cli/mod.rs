@@ -42,7 +42,6 @@ pub enum Command {
     /// Configure a Fleet project
     Configure,
 }
-
 #[derive(Debug, Parser)]
 #[clap(
     name = crate_name!(),
@@ -70,7 +69,7 @@ impl CLI {
                 // no issues here
             }
             _ => {
-                println!(
+                eprintln!(
                     "{} You are not using a {} compiler. Run {}.",
                     Yellow.paint("=>"),
                     Purple.paint("`nightly`"),
@@ -92,7 +91,7 @@ impl CLI {
         }
 
         if !sccache_path.exists() {
-            println!(
+            eprintln!(
                 "{} You have not installed {}. Run {}.",
                 Yellow.paint("=>"),
                 Purple.paint("`sccache`"),
@@ -117,7 +116,7 @@ impl CLI {
             let clang_path = std::path::Path::new("/usr/bin/clang");
 
             if !clang_path.exists() {
-                println!(
+                eprintln!(
                     "{} You have not installed {}. Run {}.",
                     Yellow.paint("=>"),
                     Purple.paint("`clang`"),
@@ -128,7 +127,7 @@ impl CLI {
             let zld_path = std::path::Path::new("/usr/bin/zld");
 
             if !zld_path.exists() {
-                println!(
+                eprintln!(
                     "{} You have not installed {}. Run {}.",
                     Yellow.paint("=>"),
                     Purple.paint("`zld`"),

@@ -88,7 +88,7 @@ impl FleetConfig {
 
                 config
             } else {
-                println!("Invalid fleet configuration");
+                eprintln!("Invalid fleet configuration");
                 exit(1)
             }
         } else {

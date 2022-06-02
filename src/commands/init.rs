@@ -36,7 +36,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
 
     if !cargo_toml.exists() {
         if let Err(cmd) = Command::new("cargo").arg("init").status() {
-            println!("{}: failed to run cargo init: {}", Red.paint("error"), cmd);
+            eprintln!("{}: failed to run cargo init: {}", Red.paint("error"), cmd);
             exit(1);
         }
     }
@@ -61,14 +61,14 @@ pub fn enable_fleet(app: crate::cli::app::App) {
                 // check if target_dir is not a symlink, if yes delete it
                 if !target_dir.is_symlink() && target_dir.exists() {
                     if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
-                        println!("{} {}", Red.paint("error: "), &err);
+                        eprintln!("{} {}", Red.paint("error: "), &err);
                         exit(1)
                     }
                 }
 
                 if !fleet_dir.exists() {
                     if let Err(err) = std::fs::create_dir(fleet_dir.clone()) {
-                        println!("{} {}", Red.paint("error: "), &err);
+                        eprintln!("{} {}", Red.paint("error: "), &err);
                         exit(1)
                     }
                 }
@@ -91,7 +91,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
 
     if !config_toml.exists() && !config_no_toml.exists() {
         std::fs::File::create(&config_toml).unwrap_or_else(|err| {
-            println!(
+            eprintln!(
                 "{}: failed to create configuration files: {}",
                 Red.paint("error"),
                 err
