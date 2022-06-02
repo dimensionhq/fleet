@@ -17,7 +17,7 @@
 
 pub mod cargo;
 pub mod global;
-use ansi_term::Colour::{Cyan, Yellow};
+
 use global::FleetGlobalConfig;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::exit};
@@ -60,30 +60,7 @@ impl FleetConfig {
     /// Can panic if cannot find home directory
     #[must_use]
     pub fn run_config() -> Self {
-        let cargo_home_path = std::env::var("CARGO_HOME");
-        let mut cargo_path = dirs::home_dir().unwrap().join(".cargo").join("bin");
-
         let global_config = FleetGlobalConfig::run_config();
-
-        if let Ok(cargo_home) = cargo_home_path {
-            cargo_path = PathBuf::from(cargo_home).join("bin");
-        }
-
-        let mut sccache_path = cargo_path.join("sccache");
-
-        if cfg!(windows) {
-            sccache_path = cargo_path.join("sccache.exe");
-        }
-
-        if !sccache_path.exists() {
-            println!(
-                "`{}` {} at {:?}, run {}",
-                Cyan.paint("sccache"),
-                Yellow.paint("not found"),
-                sccache_path,
-                Cyan.paint("`cargo install sccache`")
-            );
-        }
 
         let config_path = std::env::current_dir()
             .expect("cannot find current directory")
@@ -94,33 +71,19 @@ impl FleetConfig {
             let config = toml::from_str::<Self>(&config_file);
 
             if let Ok(mut config) = config {
-                config.build.sccache = Some(
-                    config
-                        .build
-                        .sccache
-                        .as_ref()
-                        .unwrap_or(&global_config.build.sccache)
-                        .clone(),
-                );
+                if config.build.sccache.is_none() {
+                    config.build.sccache = global_config.build.sccache;
+                }
 
-                config.build.lld = Some(
-                    config
-                        .build
-                        .lld
-                        .as_ref()
-                        .unwrap_or(&global_config.build.lld)
-                        .clone()
-                );
+                if config.build.lld.is_none() {
+                    config.build.lld = global_config.build.lld;
+                }
 
-                config.build.clang = Some(
-                    config
-                        .build
-                        .clang
-                        .as_ref()
-                        .unwrap_or(&global_config.build.clang)
-                        .clone()
-                );
-                // todo: use global variable to update path of sccache, lld and clang on everytime
+                if config.build.clang.is_none() {
+                    config.build.clang = global_config.build.clang;
+                }
+
+                // todo: use global variable to update path of sccache, lld and clang  everytime
                 // config.update_sccache(&sccache_path);
 
                 config

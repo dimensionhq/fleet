@@ -18,9 +18,13 @@
 use crate::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
-    path,
+    path::{self, PathBuf},
     process::{exit, Command},
 };
+
+fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
+    path.map(|path| path.to_str().unwrap().to_string())
+}
 
 #[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
@@ -39,12 +43,6 @@ pub fn enable_fleet(app: crate::cli::app::App) {
 
     let config = app.config;
     let os = std::env::consts::OS;
-
-    let config_path = std::env::current_dir().unwrap().join("fleet.toml");
-
-    let config_file = toml::to_string(&config).unwrap();
-
-    std::fs::write(config_path, config_file).unwrap();
 
     if os != "windows" {
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
@@ -108,9 +106,9 @@ pub fn enable_fleet(app: crate::cli::app::App) {
         } else {
             config_no_toml.to_str().unwrap()
         },
-        config.build.sccache.unwrap().to_str().unwrap(),
-        config.build.clang.unwrap().to_str().unwrap(),
-        config.build.lld.unwrap().to_str().unwrap(),
+        string_path_unwrap(config.build.sccache),
+        string_path_unwrap(config.build.clang),
+        string_path_unwrap(config.build.lld),
     );
 
     println!("🚀 {}", Green.paint("Fleet is ready!"));

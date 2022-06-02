@@ -50,7 +50,7 @@ pub struct Profile {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Build {
     #[serde(rename = "rustc-wrapper")]
-    pub rustc_wrapper: String,
+    pub rustc_wrapper: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,13 +72,13 @@ pub struct Target {
 /// Can panic if cannot prettify config
 pub fn add_rustc_wrapper_and_target_configs(
     path: &str,
-    sccache_path: &str,
-    clang_path: &str,
-    lld_path: &str,
+    sccache_path: Option<String>,
+    clang_path: Option<String>,
+    lld_path: Option<String>,
 ) {
     let config: ConfigToml = ConfigToml {
         build: Build {
-            rustc_wrapper: sccache_path.to_string(),
+            rustc_wrapper: sccache_path,
         },
         target: Target {
             mac: TargetValues {
@@ -92,14 +92,14 @@ pub fn add_rustc_wrapper_and_target_configs(
             },
             windows: TargetValues {
                 rustflags: vec![String::from("-Zshare-generics=y")],
-                linker: Some(lld_path.to_string()),
+                linker: lld_path,
             },
             linux: TargetValues {
                 rustflags: vec![
                     String::from("-Clink-arg=-fuse-ld=lld"),
                     String::from("-Zshare-generics=y"),
                 ],
-                linker: Some(clang_path.to_string()),
+                linker: clang_path,
             },
         },
         profile: Profile {
