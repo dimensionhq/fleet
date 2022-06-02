@@ -241,15 +241,16 @@ The blazing fast build tool for Rust.
                 "repair" => {
                     enable_fleet(app);
 
-                    let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
-                    let config_file = config_dir.join("config.toml");
+                    let config_file = dirs::home_dir()
+                        .unwrap()
+                        .join(".config")
+                        .join("fleet")
+                        .join("config.toml");
 
-                    if !config_dir.exists() || !config_file.exists() {
-                        FleetGlobalConfig::run_config();
-                    } else {
+                    if config_file.exists() {
                         fs::remove_file(config_file).expect("Failed to delete file");
-                        FleetGlobalConfig::run_config();
                     }
+                    FleetGlobalConfig::run_config();
                 }
                 "configure" => {
                     let prompt = format!("Select a {}:", "Linker".bright_cyan());

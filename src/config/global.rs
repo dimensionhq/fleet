@@ -50,7 +50,6 @@ impl FleetGlobalConfig {
 
             println!("Invalid fleet global configuration");
             exit(1)
-            
         }
 
         let config = FleetGlobalConfig {
