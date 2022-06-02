@@ -37,6 +37,7 @@ pub struct Build {
     pub sccache: Option<PathBuf>,
     pub lld: Option<PathBuf>,
     pub clang: Option<PathBuf>,
+    pub zld: Option<PathBuf>,
 }
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
@@ -62,6 +63,7 @@ impl FleetConfig {
                 sccache: None,
                 lld: None,
                 clang: None,
+                zld: None,
             },
         }
     }
@@ -93,8 +95,9 @@ impl FleetConfig {
                     config.build.clang = global_config.build.clang;
                 }
 
-                // todo: use global variable to update path of sccache, lld and clang  everytime
-                // config.update_sccache(&sccache_path);
+                if config.build.zld.is_none() {
+                    config.build.zld = global_config.build.zld;
+                }
 
                 config
             } else {
@@ -109,29 +112,12 @@ impl FleetConfig {
                     sccache: None,
                     lld: None,
                     clang: None,
+                    zld: None,
                 },
             };
             let config_file = toml::to_string(&config).unwrap();
             std::fs::write(config_path, config_file).unwrap();
             config
         }
-    }
-
-    #[allow(unused)]
-    fn update_sccache(&mut self, sccache_path: &PathBuf) -> Self {
-        let home_dir = dirs::home_dir().unwrap();
-
-        if &(self.build.sccache.clone().unwrap()) == sccache_path {
-            let sccache_path = std::path::Path::new(&home_dir)
-                .join(".cargo")
-                .join("bin")
-                .join("sccache");
-
-            self.build.sccache = Some(sccache_path);
-            let config_path = std::env::current_dir().unwrap().join("fleet.toml");
-            let config_file = toml::to_string(&self).unwrap();
-            std::fs::write(config_path, config_file).unwrap();
-        }
-        self.clone()
     }
 }

@@ -23,6 +23,7 @@ pub struct Build {
     pub sccache: Option<PathBuf>,
     pub lld: Option<PathBuf>,
     pub clang: Option<PathBuf>,
+    pub zld: Option<PathBuf>,
 }
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
@@ -57,6 +58,7 @@ impl FleetGlobalConfig {
                 sccache: find("sccache"),
                 lld: Some(PathBuf::from("rust-lld.exe")),
                 clang: find("clang"),
+                zld: find("zld"),
             },
         };
 

@@ -75,8 +75,9 @@ pub fn add_rustc_wrapper_and_target_configs(
     sccache_path: Option<String>,
     clang_path: Option<String>,
     lld_path: Option<String>,
+    zld_path: Option<String>,
 ) {
-    let config: ConfigToml = ConfigToml {
+    let mut config: ConfigToml = ConfigToml {
         build: Build {
             rustc_wrapper: sccache_path,
         },
@@ -84,7 +85,6 @@ pub fn add_rustc_wrapper_and_target_configs(
             mac: TargetValues {
                 rustflags: vec![
                     String::from("-C"),
-                    String::from("link-arg=-fuse-ld=/usr/local/bin/zld"),
                     String::from("-Zshare-generics=y"),
                     String::from("-Csplit-debuginfo=unpacked"),
                 ],
@@ -120,6 +120,14 @@ pub fn add_rustc_wrapper_and_target_configs(
             },
         },
     };
+
+    if let Some(zld) = zld_path {
+        config
+            .target
+            .mac
+            .rustflags
+            .push(format!("link-arg=-fuse-ld={}", zld));
+    }
 
     let toml_string = toml::to_string_pretty(&config).expect("Cannot prettify config");
 

@@ -109,6 +109,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
         string_path_unwrap(config.build.sccache),
         string_path_unwrap(config.build.clang),
         string_path_unwrap(config.build.lld),
+        string_path_unwrap(config.build.zld),
     );
 
     println!("🚀 {}", Green.paint("Fleet is ready!"));
