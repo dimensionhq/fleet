@@ -18,7 +18,7 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
-use std::{env, fs, path::PathBuf, process::exit};
+use std::{env, fs, process::exit};
 
 use crate::{
     commands::init::enable_fleet,

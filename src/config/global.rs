@@ -17,11 +17,7 @@
 
 use crate::config::find;
 use serde::{Deserialize, Serialize};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::exit,
-};
+use std::{fs, path::PathBuf, process::exit};
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
     pub sccache: Option<PathBuf>,
@@ -37,7 +33,6 @@ pub struct FleetGlobalConfig {
 impl FleetGlobalConfig {
     /// # Panics
     /// can panic if home dir not found
-    #[must_use]
     pub fn run_config() -> Self {
         let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
 
@@ -51,10 +46,11 @@ impl FleetGlobalConfig {
             let config_file = fs::read_to_string(&config_path).unwrap();
             if let Ok(config) = toml::from_str::<Self>(&config_file) {
                 return config;
-            } else {
-                println!("Invalid fleet global configuration");
-                exit(1)
             }
+
+            println!("Invalid fleet global configuration");
+            exit(1)
+            
         }
 
         let config = FleetGlobalConfig {
