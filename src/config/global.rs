@@ -43,7 +43,6 @@ pub struct FleetGlobalConfig {
 impl FleetGlobalConfig {
     /// # Panics
     /// can panic if home dir not found
-    #[must_use]
     pub fn run_config() -> Self {
         let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
 

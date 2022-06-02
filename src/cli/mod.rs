@@ -18,9 +18,9 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
-use std::{env, path::PathBuf, process::exit};
+use std::{env, path::PathBuf, process::exit, fs};
 
-use crate::commands::init::enable_fleet;
+use crate::{commands::init::enable_fleet, config::global::FleetGlobalConfig};
 
 use self::{
     app::App,
@@ -156,7 +156,8 @@ The blazing fast build tool for Rust.
 {}:
     build    Build a Fleet project
     run      Run a Fleet project
-    configure Configure a Fleet project"#,
+    configure Configure a Fleet project
+    repair   Fix the binary path for the all dependencies used"#,
             Green.paint("fleet"),
             env!("CARGO_PKG_VERSION"),
             Yellow.paint("USAGE"),
@@ -243,6 +244,26 @@ The blazing fast build tool for Rust.
                     if !status.success() {
                         CLI::handle_failure();
                     }
+                }
+                "repair" => {
+                    enable_fleet(app);
+
+                    let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");
+                    let config_file = config_dir.join("config.toml");
+
+
+                    if !config_dir.exists() || !config_file.exists(){
+                        FleetGlobalConfig::run_config();
+                    }else{
+                        fs::remove_file(config_file).expect("Failed to delete file");
+                        FleetGlobalConfig::run_config();
+                    }
+
+
+
+
+                    
+
                 }
                 "configure" => {
                     let prompt = format!("Select a {}:", "Linker".bright_cyan());
