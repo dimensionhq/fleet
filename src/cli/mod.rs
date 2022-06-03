@@ -18,9 +18,10 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
+use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color};
 use std::{env, path::PathBuf, process::exit};
 
-use crate::commands::init::enable_fleet;
+use crate::{commands::init::enable_fleet, utils::bloat::BloatCrateAnalysis};
 
 use self::{
     app::App,
@@ -62,7 +63,10 @@ impl CLI {
     /// Can panic if unable to access rust version meta
     pub fn handle_failure() {
         // check if it's a configuration issue
-        match rustc_version::version_meta().expect("Unable to see rust version meta").channel {
+        match rustc_version::version_meta()
+            .expect("Unable to see rust version meta")
+            .channel
+        {
             rustc_version::Channel::Nightly => {
                 // no issues here
             }
@@ -207,7 +211,11 @@ The blazing fast build tool for Rust.
                     enable_fleet(app);
 
                     // get all args after the subcommand
-                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
+                    let args: Vec<String> = args
+                        .iter()
+                        .skip(2)
+                        .map(std::string::ToString::to_string)
+                        .collect();
                     // Run the crate
                     let status = std::process::Command::new("cargo")
                         .arg("run")
@@ -222,7 +230,11 @@ The blazing fast build tool for Rust.
                 "build" => {
                     enable_fleet(app);
 
-                    let args: Vec<String> = args.iter().skip(2).map(std::string::ToString::to_string).collect();
+                    let args: Vec<String> = args
+                        .iter()
+                        .skip(2)
+                        .map(std::string::ToString::to_string)
+                        .collect();
 
                     let status = std::process::Command::new("cargo")
                         .arg("build")
@@ -281,6 +293,60 @@ The blazing fast build tool for Rust.
                     let linker_selected = linker_options[select.run().unwrap()].to_string();
 
                     crate::utils::configure::install_linker(&linker_selected);
+                }
+                "bloat" => {
+                    println!("Running bloat analysis");
+
+                    // Run cargo bloat
+                    let output = std::process::Command::new("cargo")
+                        .arg("bloat")
+                        .arg("--crates")
+                        .arg("--message-format=json")
+                        .output()
+                        .unwrap();
+
+                    let stdout = String::from_utf8(output.stdout).unwrap();
+
+                    let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout).unwrap();
+
+                    let total_size = byte_unit::Byte::from_bytes(data.file_size as u128);
+                    let adjusted_size = total_size.get_appropriate_unit(true);
+
+                    println!("Total Size: {}", adjusted_size.to_string().bright_yellow());
+
+                    let mut table = comfy_table::Table::new();
+
+                    table
+                        .load_preset(UTF8_FULL)
+                        .apply_modifier(UTF8_ROUND_CORNERS);
+
+                    table.set_header(vec!["Name", "Size"]);
+
+                    for _crate in data.crates.iter() {
+                        let size = byte_unit::Byte::from_bytes(_crate.size as u128);
+                        let adjusted_size = size.get_appropriate_unit(true);
+
+                        table.add_row(vec![
+                            Cell::new(_crate.name.to_string()),
+                            Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
+                        ]);
+                    }
+
+                    println!("{table}");
+
+                    // Run cargo bloat
+                    let output = std::process::Command::new("cargo")
+                        .arg("bloat")
+                        .arg("--message-format=json")
+                        .output()
+                        .unwrap();
+
+                    let stdout = String::from_utf8(output.stdout).unwrap();
+
+                    println!("{}", stdout);
+                }
+                "udeps" => {
+                    println!("cargo udeps");
                 }
                 _ => {}
             }
