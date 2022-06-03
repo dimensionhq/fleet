@@ -18,7 +18,11 @@
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
-use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color};
+use comfy_table::ContentArrangement;
+use comfy_table::Width::Percentage;
+use comfy_table::{
+    modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color, ColumnConstraint,
+};
 use std::{env, path::PathBuf, process::exit};
 
 use crate::{
@@ -308,6 +312,49 @@ The blazing fast build tool for Rust.
                         .output()
                         .unwrap();
 
+                    use std::{
+                        process::{Command, Stdio},
+                        thread::JoinHandle,
+                    };
+
+                    struct Callback;
+
+                    impl std::io::Write for Callback {
+                        fn write(&mut self, data: &[u8]) -> std::io::Result<usize> {
+                            // your arbitrary behavior here
+                            let contents = String::from_utf8_lossy(data).to_string();
+
+                            println!("Read: {}", contents);
+
+                            Ok(data.len())
+                        }
+
+                        fn flush(&mut self) -> std::io::Result<()> {
+                            Ok(())
+                        }
+                    }
+
+                    let mut child = Command::new("cargo")
+                        .arg("bloat")
+                        .stdout(Stdio::piped())
+                        .stderr(Stdio::piped())
+                        .spawn()
+                        .unwrap();
+
+                    let mut handles: Vec<JoinHandle<()>> = vec![];
+
+                    handles.push(std::thread::spawn(move || {
+                        std::io::copy(child.stderr.as_mut().unwrap(), &mut Callback).unwrap();
+                    }));
+
+                    handles.push(std::thread::spawn(move || {
+                        std::io::copy(child.stdout.as_mut().unwrap(), &mut Callback).unwrap();
+                    }));
+
+                    for handle in handles {
+                        handle.join().unwrap();
+                    }
+
                     let stdout = String::from_utf8(output.stdout).unwrap();
 
                     let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout).unwrap();
@@ -321,7 +368,8 @@ The blazing fast build tool for Rust.
 
                     table
                         .load_preset(UTF8_FULL)
-                        .apply_modifier(UTF8_ROUND_CORNERS);
+                        .apply_modifier(UTF8_ROUND_CORNERS)
+                        .set_content_arrangement(ContentArrangement::DynamicFullWidth);
 
                     table.set_header(vec!["Name", "Size"]);
 
@@ -352,22 +400,29 @@ The blazing fast build tool for Rust.
                     let mut table = comfy_table::Table::new();
 
                     table
+                        .set_content_arrangement(ContentArrangement::Dynamic)
                         .load_preset(UTF8_FULL)
                         .apply_modifier(UTF8_ROUND_CORNERS);
 
-                    table.set_header(vec!["Function", "Size"]);
+                    table.set_header(vec!["Crate", "Function", "Size"]);
 
                     for function in data.functions.iter() {
                         let size = byte_unit::Byte::from_bytes(function.size as u128);
                         let adjusted_size = size.get_appropriate_unit(true);
 
                         table.add_row(vec![
+                            Cell::new(function.crate_field.to_string()).fg(Color::Blue),
                             Cell::new(function.name.to_string()),
                             Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
                         ]);
                     }
 
                     println!("{table}");
+
+                    println!(
+                        "{}: All sizes listed are estimates and will not be 100% accurate.",
+                        "Note".bright_yellow()
+                    );
                 }
                 "udeps" => {
                     println!("cargo udeps");
