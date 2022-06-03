@@ -21,7 +21,10 @@ use colored::Colorize;
 use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color};
 use std::{env, path::PathBuf, process::exit};
 
-use crate::{commands::init::enable_fleet, utils::bloat::BloatCrateAnalysis};
+use crate::{
+    commands::init::enable_fleet,
+    utils::bloat::{BloatCrateAnalysis, BloatFunctionAnalysis},
+};
 
 use self::{
     app::App,
@@ -334,6 +337,7 @@ The blazing fast build tool for Rust.
 
                     println!("{table}");
 
+                    println!("Running function analysis...");
                     // Run cargo bloat
                     let output = std::process::Command::new("cargo")
                         .arg("bloat")
@@ -343,7 +347,27 @@ The blazing fast build tool for Rust.
 
                     let stdout = String::from_utf8(output.stdout).unwrap();
 
-                    println!("{}", stdout);
+                    let data = serde_json::from_str::<BloatFunctionAnalysis>(&stdout).unwrap();
+
+                    let mut table = comfy_table::Table::new();
+
+                    table
+                        .load_preset(UTF8_FULL)
+                        .apply_modifier(UTF8_ROUND_CORNERS);
+
+                    table.set_header(vec!["Function", "Size"]);
+
+                    for function in data.functions.iter() {
+                        let size = byte_unit::Byte::from_bytes(function.size as u128);
+                        let adjusted_size = size.get_appropriate_unit(true);
+
+                        table.add_row(vec![
+                            Cell::new(function.name.to_string()),
+                            Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
+                        ]);
+                    }
+
+                    println!("{table}");
                 }
                 "udeps" => {
                     println!("cargo udeps");
