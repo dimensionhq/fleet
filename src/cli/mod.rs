@@ -458,7 +458,15 @@ The blazing fast build tool for Rust.
                 "udeps" => {
                     println!("cargo udeps");
                 }
-                _ => {}
+                _ => {
+                    // TODO: add "did you mean?
+
+                    println!(
+                        "{}: `{}` is an invalid subcommand",
+                        "error".bright_red().bold(),
+                        cmd.as_str().bright_cyan()
+                    );
+                }
             }
         }
     }
