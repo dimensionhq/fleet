@@ -40,3 +40,6 @@ jobs:
 
       - name: Run app using fleet
         run: fleet build --bin fleet
+
+      - name: Run bloat analysis
+        run: fleet bloat

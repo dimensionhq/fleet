@@ -16,13 +16,24 @@
  */
 
 use ansi_term::Colour::{Cyan, Green, Purple, Yellow};
+use cargo_util::ProcessBuilder;
 use clap::{crate_authors, crate_description, crate_name, crate_version, AppSettings, Parser};
 use colored::Colorize;
 use std::{env, process::exit};
 
 use crate::{
     commands::init::enable_fleet,
-    config::{find},
+    config::find };
+
+use comfy_table::ContentArrangement;
+use comfy_table::{
+    modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color,
+};
+
+use indicatif::{ProgressBar, ProgressStyle};
+    
+use crate::{
+    utils::bloat::{BloatCrateAnalysis, BloatFunctionAnalysis},
 };
 
 use self::{
@@ -60,7 +71,11 @@ pub struct CLI {
 }
 
 impl CLI {
-    /// # Panics
+    /// Handles the failure of a cargo command execution.
+    /// 
+    /// The reason is identified and outputed to console with a suggestion to fix it.
+    /// 
+    ///  # Panics
     /// Can panic if unable to access rust version meta
     pub fn handle_failure() {
         // check if it's a configuration issue
@@ -130,6 +145,7 @@ impl CLI {
         exit(1);
     }
 
+    /// Display help
     pub fn display_help(cmd: &str) {
         let mut help_menu = format!(
             r#"{} {}
@@ -164,6 +180,8 @@ The blazing fast build tool for Rust.
         println!("{}", help_menu);
     }
 
+    /// Parses the command and handles it.
+    /// 
     /// # Panics
     /// Can panic if unable to cargo run
     pub fn run() {
@@ -284,7 +302,169 @@ The blazing fast build tool for Rust.
 
                     crate::utils::configure::install_linker(&linker_selected);
                 }
-                _ => {}
+                "bloat" => {
+                    let spinner = ProgressBar::new_spinner();
+
+                    spinner.set_style(ProgressStyle::default_spinner().template("{spinner} {msg}"));
+
+                    spinner.set_message("Initializing".bright_green().to_string());
+
+                    spinner.enable_steady_tick(10);
+
+                    // Run cargo bloat
+                    let mut command = ProcessBuilder::new("cargo");
+
+                    command
+                        .arg("bloat")
+                        .arg("--crates")
+                        .arg("--message-format=json");
+
+                    // TODO: run both analysis at the same time
+
+                    let mut warning_count = 0;
+                    let mut error_count = 0;
+
+                    let output = command.exec_with_streaming(
+                        &mut |_| Ok(()),
+                        &mut |on_stderr| {
+                            let contents = on_stderr.trim().to_string();
+
+                            if !contents.is_empty() {
+                                let chunks: Vec<&str> = contents.split(' ').collect();
+
+                                if contents.starts_with("Compiling") {
+                                    let name = chunks[1].to_string();
+
+                                    let mut version = chunks[2].to_string();
+
+                                    if version.starts_with('v') {
+                                        version.remove(0);
+                                    }
+
+                                    spinner.set_message(format!(
+                                        "{} ({}{}{})",
+                                        "Compile".bright_cyan(),
+                                        name.bright_yellow(),
+                                        "@".bright_magenta(),
+                                        version.bright_black(),
+                                    ));
+                                }
+
+                                if contents.starts_with("warning:") {
+                                    warning_count += 1;
+                                    spinner.set_message(format!(
+                                        "{} ({} {}, {} {})",
+                                        "Check".bright_cyan(),
+                                        warning_count.to_string().bright_magenta(),
+                                        "warnings".bright_yellow(),
+                                        error_count.to_string().bright_red(),
+                                        "errors".bright_yellow(),
+                                    ));
+                                }
+
+                                if contents.starts_with("error") {
+                                    error_count += 1;
+                                }
+                            }
+
+                            Ok(())
+                        },
+                        true,
+                    );
+
+                    if output.is_err() {
+                        spinner.finish();
+
+                        std::process::Command::new("cargo")
+                            .arg("check")
+                            .status()
+                            .unwrap();
+
+                        std::process::exit(1);
+                    }
+
+                    spinner.set_message("Analysing".bright_cyan().to_string());
+
+                    let stdout = String::from_utf8(output.unwrap().stdout).unwrap();
+
+                    let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout).unwrap();
+
+                    let total_size = byte_unit::Byte::from_bytes(data.file_size as u128);
+                    let adjusted_size = total_size.get_appropriate_unit(true);
+
+                    println!("Total Size: {}", adjusted_size.to_string().bright_yellow());
+
+                    let mut crates_table = comfy_table::Table::new();
+
+                    crates_table
+                        .load_preset(UTF8_FULL)
+                        .apply_modifier(UTF8_ROUND_CORNERS)
+                        .set_content_arrangement(ContentArrangement::DynamicFullWidth);
+
+                    crates_table.set_header(vec!["Name", "Size"]);
+
+                    for crate_ in &data.crates {
+                        let size = byte_unit::Byte::from_bytes(crate_.size as u128);
+                        let adjusted_size = size.get_appropriate_unit(true);
+
+                        crates_table.add_row(vec![
+                            Cell::new(crate_.name.to_string()).fg(Color::Blue),
+                            Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
+                        ]);
+                    }
+
+                    let output = std::process::Command::new("cargo")
+                        .arg("bloat")
+                        .arg("--message-format=json")
+                        .output()
+                        .unwrap();
+
+                    let stdout = String::from_utf8(output.stdout).unwrap();
+
+                    let data = serde_json::from_str::<BloatFunctionAnalysis>(&stdout).unwrap();
+
+                    let mut function_table = comfy_table::Table::new();
+
+                    function_table
+                        .set_content_arrangement(ContentArrangement::Dynamic)
+                        .load_preset(UTF8_FULL)
+                        .apply_modifier(UTF8_ROUND_CORNERS);
+
+                    function_table.set_header(vec!["Crate", "Function", "Size"]);
+
+                    for function in &data.functions {
+                        let size = byte_unit::Byte::from_bytes(function.size as u128);
+                        let adjusted_size = size.get_appropriate_unit(true);
+
+                        function_table.add_row(vec![
+                            Cell::new(function.crate_field.to_string()).fg(Color::Blue),
+                            Cell::new(function.name.to_string()),
+                            Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
+                        ]);
+                    }
+
+                    spinner.finish_and_clear();
+
+                    println!("{crates_table}");
+                    println!("{function_table}");
+
+                    println!(
+                        "{}: All sizes shown are estimates and will not be 100% accurate.",
+                        "Note".bright_yellow()
+                    );
+                }
+                "udeps" => {
+                    println!("cargo udeps");
+                }
+                _ => {
+                    // TODO: add "did you mean?
+
+                    println!(
+                        "{}: `{}` is an invalid subcommand",
+                        "error".bright_red().bold(),
+                        cmd.as_str().bright_cyan()
+                    );
+                }
             }
         }
     }

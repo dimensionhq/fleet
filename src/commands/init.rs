@@ -22,6 +22,7 @@ use std::{
     process::{exit, Command},
 };
 
+/// Unwraps a item of Option<PathBuf> and returns the path as a String in Option<String>
 fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
     path.map(|path| path.to_str().unwrap().to_string())
 }
@@ -29,7 +30,13 @@ fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
 #[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
-/// # Panics
+/// If the `./.cargo/config.toml` doesn't exist, it is created.
+/// 
+/// The application config is written onto the `./.cargo/config.toml`.
+/// 
+/// Ramdisk improvements are applied if the disk is a HDD and the program is using WSL
+/// 
+///  # Panics
 /// Can panic if cannot get `dirs::home_dir`
 pub fn enable_fleet(app: crate::cli::app::App) {
     let cargo_toml = path::Path::new("./Cargo.toml");

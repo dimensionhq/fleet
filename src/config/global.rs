@@ -18,6 +18,8 @@
 use crate::config::find;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf, process::exit};
+
+/// Represents the Build table of the global config file at `{home_dir}/.config/fleet/config.toml`
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct Build {
     pub sccache: Option<PathBuf>,
@@ -25,14 +27,18 @@ pub struct Build {
     pub clang: Option<PathBuf>,
     pub zld: Option<PathBuf>,
 }
-
+/// Represents the Build table of the global config file at `{home_dir}/.config/fleet/config.toml`
 #[derive(Deserialize, Debug, Serialize, Clone)]
 pub struct FleetGlobalConfig {
     pub build: Build,
 }
 
 impl FleetGlobalConfig {
-    /// # Panics
+    /// If the global fleet config file is not found, it is created with the basic settings and the config is returned.
+    /// 
+    /// If the file exists at `{home_dir}/.config/fleet`, it is read and parsed into a `FleetGlobalConfig` instance and returned.
+    /// 
+    ///  # Panics
     /// can panic if home dir not found
     pub fn run_config() -> Self {
         let config_dir = dirs::home_dir().unwrap().join(".config").join("fleet");

@@ -2,6 +2,12 @@ use std::env::consts::OS;
 
 use colored::Colorize;
 
+
+/// Installs a linker
+/// 
+/// Installs the specified linker using the appropriate 
+/// package manager for the user operating system
+/// 
 /// # Panics
 /// Can panic if unable to install clang and lld
 pub fn install_linker(linker: &str) {

@@ -14,6 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+//! 
+//! Fleet is the blazing fast build tool for Rust. Compiling with Fleet is up-to 5x faster than with cargo.
+//!
+//! Note: Since fleet is in the beta phase, it might not be completely stable yet. Feel free to open any issues or bug reports at issues.
+//!
+//! Note: As of now fleet only supports rustc nightly
+//! 
 #![warn(clippy::all)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::missing_errors_doc, clippy::module_name_repetitions)]
@@ -25,6 +33,7 @@ pub mod commands;
 pub mod config;
 pub mod utils;
 
+/// Entrypoint to the CLI application
 fn main() {
     CLI::run();
 }
