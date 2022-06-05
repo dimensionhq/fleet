@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-use crate::config::cargo::add_rustc_wrapper_and_target_configs;
+use crate::core::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
     path::{self, PathBuf},
@@ -31,11 +31,11 @@ fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
 /// If the `./.cargo/config.toml` doesn't exist, it is created.
-/// 
+///
 /// The application config is written onto the `./.cargo/config.toml`.
-/// 
+///
 /// Ramdisk improvements are applied if the disk is a HDD and the program is using WSL
-/// 
+///
 ///  # Panics
 /// Can panic if cannot get `dirs::home_dir`
 pub fn enable_fleet(app: crate::cli::app::App) {

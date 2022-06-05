@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-use crate::config::find;
+use crate::core::config::find;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::PathBuf, process::exit};
 
@@ -35,9 +35,9 @@ pub struct FleetGlobalConfig {
 
 impl FleetGlobalConfig {
     /// If the global fleet config file is not found, it is created with the basic settings and the config is returned.
-    /// 
+    ///
     /// If the file exists at `{home_dir}/.config/fleet`, it is read and parsed into a `FleetGlobalConfig` instance and returned.
-    /// 
+    ///
     ///  # Panics
     /// can panic if home dir not found
     pub fn run_config() -> Self {

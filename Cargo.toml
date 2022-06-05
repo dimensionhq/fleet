@@ -25,6 +25,7 @@ bench = false
 rustc_version = "0.4.0"
 
 [dependencies]
+anyhow = "1.0.57"
 ansi_term = "0.12"
 dirs = "4.0.0"
 wsl = "0.1.0"
@@ -39,10 +40,11 @@ comfy-table = "6.0.0"
 byte-unit = "4.0.14"
 cargo-util = "0.1.2"
 indicatif = "0.16.2"
+human-panic = "1.0.3"
 
 [dependencies.clap]
-version = "3.1.8"
-features = ["derive", "cargo", "std", "color"]
+version = "3.1.18"
+features = ["cargo", "std", "color"]
 default-features = false
 
 [dependencies.serde]

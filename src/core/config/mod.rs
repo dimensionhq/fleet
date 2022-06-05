@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-/// Handles configuration of the fleet setup and execution 
-
+/// Handles configuration of the fleet setup and execution
 pub mod cargo;
+pub mod enable;
 pub mod global;
 
 use global::FleetGlobalConfig;
@@ -25,9 +25,8 @@ use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, process::exit};
 use which::which;
 
-
 /// Finds the path of a binary
-/// 
+///
 /// Finds the path of a binary and returns the path if it exists
 #[must_use]
 pub fn find(bin: &str) -> Option<PathBuf> {
@@ -62,7 +61,6 @@ impl Default for FleetConfig {
 }
 
 impl FleetConfig {
-
     /// Initialize an empty `FleetConfig` instance with empty data
     #[must_use]
     pub fn new() -> Self {
@@ -79,14 +77,14 @@ impl FleetConfig {
     }
 
     /// Creates and read the `fleet.toml` file
-    /// 
-    /// 
+    ///
+    ///
     /// If the fleet.toml does not exist, it is created with the basic settings and the basic config is returned.
-    /// 
+    ///
     /// If it does exist, the `fleet.toml` file is read and the data is parsed into `FleetConfig` and returned.
-    /// 
+    ///
     /// When a particular field of the `build` table is empty, it is substituted with the value from the global fleet config.
-    /// 
+    ///
     /// T
     /// # Panics
     /// Can panic if cannot find home directory

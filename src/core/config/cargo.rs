@@ -68,12 +68,12 @@ pub struct Target {
     pub mac: TargetValues,
 }
 
-/// 
+///
 /// Creates and writes the config into `./.cargo/config.toml`
-/// 
+///
 /// The `./.cargo/config.toml` is used by `cargo` to choose the building/running of a crate with rustc.
-/// 
-/// 
+///
+///
 /// # Panics
 /// Can panic if cannot prettify config
 pub fn add_rustc_wrapper_and_target_configs(
