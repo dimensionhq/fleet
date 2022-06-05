@@ -46,5 +46,9 @@ jobs:
       - name: Install fleet
         run: cargo install --path . fleet-rs -f
 
+
+      - name: Install cargo bloat
+        run: cargo install cargo-bloat
+
       - name: Run bloat analysis
         run: fleet bloat
