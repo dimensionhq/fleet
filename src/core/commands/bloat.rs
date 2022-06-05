@@ -16,7 +16,6 @@
  */
 
 use crate::cli::app::App;
-use crate::utils::bloat::{BloatCrateAnalysis, BloatFunctionAnalysis};
 use anyhow::Result;
 use cargo_util::ProcessBuilder;
 use clap::Values;
@@ -25,6 +24,44 @@ use comfy_table::ContentArrangement;
 use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Cell, Color};
 use indicatif::{ProgressBar, ProgressStyle};
 use std::thread::JoinHandle;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BloatCrateAnalysis {
+    #[serde(rename = "file-size")]
+    pub file_size: i64,
+    #[serde(rename = "text-section-size")]
+    pub text_section_size: i64,
+    pub crates: Vec<Crate>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Crate {
+    pub name: String,
+    pub size: i64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BloatFunctionAnalysis {
+    #[serde(rename = "file-size")]
+    pub file_size: i64,
+    #[serde(rename = "text-section-size")]
+    pub text_section_size: i64,
+    pub functions: Vec<Function>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Function {
+    #[serde(rename = "crate")]
+    pub crate_field: String,
+    pub name: String,
+    pub size: i64,
+}
 
 /// Panics:
 pub fn run(_app: App, _args: Option<Values>) -> Result<()> {

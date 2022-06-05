@@ -23,7 +23,7 @@ use colored::Colorize;
 use std::{env::current_dir, path::PathBuf};
 
 use crate::cli::help;
-use crate::core::commands::{bloat, build, configure, init, run};
+use crate::core::commands::{bloat, build, configure, init, run, udeps};
 use anyhow::Result;
 use std::process::{self, exit};
 
@@ -33,6 +33,7 @@ pub enum Command {
     Run(Option<Values<'static>>),
     Bloat(Option<Values<'static>>),
     Configure(Option<Values<'static>>),
+    Udeps(Option<Values<'static>>),
 }
 
 pub struct App {
@@ -54,11 +55,7 @@ impl App {
     #[must_use]
     pub fn new() -> Self {
         let current_dir = current_dir().expect("Unable to find current directory for app!");
-        // let config = FleetConfig::new();
-        // check
-        // let config = config.run_config();
 
-        //wasn't using the self argument anyway, so unsure of use
         Self {
             config: FleetConfig::run_config(),
             current_dir,
@@ -70,7 +67,11 @@ impl App {
             .version(crate_version!())
             .about(crate_description!())
             .author(crate_authors!())
-            .arg(arg!(-c --command <CMD>).required(false).default_missing_value(""))
+            .arg(
+                arg!(-c --command <CMD>)
+                    .required(false)
+                    .default_missing_value(""),
+            )
             .subcommand(
                 CliCommand::new("init")
                     .about("Initialize a fleet project")
@@ -88,6 +89,7 @@ impl App {
             )
             .subcommand(CliCommand::new("configure").about("Configure a fleet project"))
             .subcommand(CliCommand::new("bloat").about("?"))
+            .subcommand(CliCommand::new("udeps").about("?"))
     }
 
     fn get_command(&self) -> Command {
@@ -118,6 +120,7 @@ impl App {
             Some(("build", sub)) => Command::Build(sub.values_of("EXTRA")),
             Some(("run", sub)) => Command::Run(sub.values_of("EXTRA")),
             Some(("bloat", _sub)) => Command::Bloat(None),
+            Some(("udeps", _sub)) => Command::Udeps(None),
             Some(("configure", _sub)) => Command::Configure(None),
             _ => {
                 options.print_help().unwrap_or_else(|_| {
@@ -138,6 +141,7 @@ impl App {
             Command::Run(args) => run::run(self, args),
             Command::Bloat(args) => bloat::run(self, args),
             Command::Configure(args) => configure::run(self, args),
+            Command::Udeps(args) => udeps::run(self, args),
         }
     }
 }
