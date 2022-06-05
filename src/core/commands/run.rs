@@ -15,6 +15,19 @@
  *    limitations under the License.
  */
 
-/// Utility features used within the fleet application
-pub mod bloat;
-pub mod configure;
+use crate::cli::app::App;
+use crate::core::config::enable::enable_fleet;
+use anyhow::Result;
+use clap::Values;
+
+pub fn run(app: App, args: Option<Values>) -> Result<()> {
+    enable_fleet(app);
+
+    let args = args.unwrap_or_default();
+    std::process::Command::new("cargo")
+        .arg("run")
+        .args(args)
+        .status()?;
+
+    Ok(())
+}

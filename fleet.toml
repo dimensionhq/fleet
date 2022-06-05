@@ -1,5 +1,4 @@
 rd_enabled = true
-fleet_id = "19f92877-035d-4689-b984-dcc1593505a2"
+fleet_id = "eec7a0b5-3138-4bf6-989b-7e49c41c3e29"
 
 [build]
-sccache = "C:\\Users\\xtrem\\.cargo\\bin\\sccache"

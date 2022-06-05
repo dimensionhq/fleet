@@ -15,4 +15,8 @@
  *    limitations under the License.
  */
 
+pub mod bloat;
+pub mod build;
+pub mod configure;
 pub mod init;
+pub mod run;

@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
-/// Utility features used within the fleet application
-pub mod bloat;
-pub mod configure;
+use crate::cli::app::App;
+use anyhow::Result;
+use clap::Values;
+
+pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
+    todo!()
+}

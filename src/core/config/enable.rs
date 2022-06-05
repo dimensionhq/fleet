@@ -15,53 +15,41 @@
  *    limitations under the License.
  */
 
-use crate::config::cargo::add_rustc_wrapper_and_target_configs;
+use crate::core::config::cargo::add_rustc_wrapper_and_target_configs;
 use ansi_term::Colour::{Green, Red};
 use std::{
     path::{self, PathBuf},
     process::{exit, Command},
 };
 
+/// Unwraps a item of Option<PathBuf> and returns the path as a String in Option<String>
+fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
+    path.map(|path| path.to_str().unwrap().to_string())
+}
+
 #[cfg(unix)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
-/// # Panics
+/// If the `./.cargo/config.toml` doesn't exist, it is created.
+///
+/// The application config is written onto the `./.cargo/config.toml`.
+///
+/// Ramdisk improvements are applied if the disk is a HDD and the program is using WSL
+///
+///  # Panics
 /// Can panic if cannot get `dirs::home_dir`
 pub fn enable_fleet(app: crate::cli::app::App) {
     let cargo_toml = path::Path::new("./Cargo.toml");
 
     if !cargo_toml.exists() {
         if let Err(cmd) = Command::new("cargo").arg("init").status() {
-            println!("{}: failed to run cargo init: {}", Red.paint("error"), cmd);
+            eprintln!("{}: failed to run cargo init: {}", Red.paint("error"), cmd);
             exit(1);
         }
     }
 
-    let mut config = app.config;
+    let config = app.config;
     let os = std::env::consts::OS;
-
-    let path = std::env::var("CARGO_HOME");
-    let mut cargo_path = dirs::home_dir().expect("Cannot get home dir for cargo path");
-
-    match path {
-        Ok(p) => {
-            cargo_path = PathBuf::from(p).join("bin");
-        }
-        Err(_) => cargo_path = cargo_path.join(".cargo").join("bin"),
-    }
-
-    let mut sccache_path = cargo_path.join("sccache");
-
-    if cfg!(windows) {
-        sccache_path = cargo_path.join("sccache.exe");
-    }
-    config.build.sccache = sccache_path;
-
-    let config_path = std::env::current_dir().unwrap().join("fleet.toml");
-
-    let config_file = toml::to_string(&config).unwrap();
-
-    std::fs::write(config_path, config_file).unwrap();
 
     if os != "windows" {
         // ramdisk improvements are only found if the disk is a HDD and the program is using WSL
@@ -80,14 +68,14 @@ pub fn enable_fleet(app: crate::cli::app::App) {
                 // check if target_dir is not a symlink, if yes delete it
                 if !target_dir.is_symlink() && target_dir.exists() {
                     if let Err(err) = std::fs::remove_dir_all(target_dir.clone()) {
-                        println!("{} {}", Red.paint("error: "), &err);
+                        eprintln!("{} {}", Red.paint("error: "), &err);
                         exit(1)
                     }
                 }
 
                 if !fleet_dir.exists() {
                     if let Err(err) = std::fs::create_dir(fleet_dir.clone()) {
-                        println!("{} {}", Red.paint("error: "), &err);
+                        eprintln!("{} {}", Red.paint("error: "), &err);
                         exit(1)
                     }
                 }
@@ -110,7 +98,7 @@ pub fn enable_fleet(app: crate::cli::app::App) {
 
     if !config_toml.exists() && !config_no_toml.exists() {
         std::fs::File::create(&config_toml).unwrap_or_else(|err| {
-            println!(
+            eprintln!(
                 "{}: failed to create configuration files: {}",
                 Red.paint("error"),
                 err
@@ -125,7 +113,10 @@ pub fn enable_fleet(app: crate::cli::app::App) {
         } else {
             config_no_toml.to_str().unwrap()
         },
-        config.build.sccache.to_str().unwrap(),
+        string_path_unwrap(config.build.sccache),
+        string_path_unwrap(config.build.clang),
+        string_path_unwrap(config.build.lld),
+        string_path_unwrap(config.build.zld),
     );
 
     println!("🚀 {}", Green.paint("Fleet is ready!"));

@@ -50,7 +50,7 @@ pub struct Profile {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Build {
     #[serde(rename = "rustc-wrapper")]
-    pub rustc_wrapper: String,
+    pub rustc_wrapper: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -68,18 +68,29 @@ pub struct Target {
     pub mac: TargetValues,
 }
 
+///
+/// Creates and writes the config into `./.cargo/config.toml`
+///
+/// The `./.cargo/config.toml` is used by `cargo` to choose the building/running of a crate with rustc.
+///
+///
 /// # Panics
 /// Can panic if cannot prettify config
-pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
-    let config: ConfigToml = ConfigToml {
+pub fn add_rustc_wrapper_and_target_configs(
+    path: &str,
+    sccache_path: Option<String>,
+    clang_path: Option<String>,
+    lld_path: Option<String>,
+    zld_path: Option<String>,
+) {
+    let mut config: ConfigToml = ConfigToml {
         build: Build {
-            rustc_wrapper: sccache_path.to_string(),
+            rustc_wrapper: sccache_path,
         },
         target: Target {
             mac: TargetValues {
                 rustflags: vec![
                     String::from("-C"),
-                    String::from("link-arg=-fuse-ld=/usr/local/bin/zld"),
                     String::from("-Zshare-generics=y"),
                     String::from("-Csplit-debuginfo=unpacked"),
                 ],
@@ -87,14 +98,14 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
             },
             windows: TargetValues {
                 rustflags: vec![String::from("-Zshare-generics=y")],
-                linker: Some(String::from("rust-lld.exe")),
+                linker: lld_path,
             },
             linux: TargetValues {
                 rustflags: vec![
                     String::from("-Clink-arg=-fuse-ld=lld"),
                     String::from("-Zshare-generics=y"),
                 ],
-                linker: Some(String::from("/usr/bin/clang")),
+                linker: clang_path,
             },
         },
         profile: Profile {
@@ -116,10 +127,18 @@ pub fn add_rustc_wrapper_and_target_configs(path: &str, sccache_path: &str) {
         },
     };
 
+    if let Some(zld) = zld_path {
+        config
+            .target
+            .mac
+            .rustflags
+            .push(format!("link-arg=-fuse-ld={}", zld));
+    }
+
     let toml_string = toml::to_string_pretty(&config).expect("Cannot prettify config");
 
     std::fs::write(path, toml_string).unwrap_or_else(|err| {
-        println!(
+        eprintln!(
             "{}: failed to write configuration: {}",
             Red.paint("error"),
             err
