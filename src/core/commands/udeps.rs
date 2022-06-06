@@ -15,12 +15,37 @@
  *    limitations under the License.
  */
 
+use std::collections::HashMap;
+
 use crate::cli::app::App;
 use anyhow::Result;
 use cargo_util::ProcessBuilder;
 use clap::Values;
 use colored::Colorize;
 use indicatif::{ProgressBar, ProgressStyle};
+
+use serde::Deserialize;
+use serde::Serialize;
+use serde_json::Value;
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UdepsAnalysis {
+    pub success: bool,
+    #[serde(rename = "unused_deps")]
+    pub unused_deps: HashMap<String, UnusedDep>,
+    pub note: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UnusedDep {
+    #[serde(rename = "manifest_path")]
+    pub manifest_path: String,
+    pub normal: Option<Vec<String>>,
+    pub development: Option<Vec<Value>>,
+    pub build: Option<Vec<String>>,
+}
 
 /// Panics:
 pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
@@ -122,9 +147,11 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
 
     spinner.set_message("Analysing".bright_cyan().to_string());
 
-    let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout_contents.trim()).unwrap();
+    let data = serde_json::from_str::<UdepsAnalysis>(&stdout_contents.trim()).unwrap();
 
     spinner.finish();
+
+    
 
     Ok(())
 }
