@@ -24,17 +24,21 @@ use clap::Values;
 use colored::Colorize;
 use indicatif::{ProgressBar, ProgressStyle};
 
+use ptree::print_tree_with;
+use ptree::Color;
+use ptree::PrintConfig;
+use ptree::Style;
+use ptree::TreeBuilder;
 use serde::Deserialize;
 use serde::Serialize;
-use serde_json::Value;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UdepsAnalysis {
     pub success: bool,
     #[serde(rename = "unused_deps")]
-    pub unused_deps: HashMap<String, UnusedDep>,
-    pub note: String,
+    pub unused_deps: Option<HashMap<String, UnusedDep>>,
+    pub note: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -43,8 +47,115 @@ pub struct UnusedDep {
     #[serde(rename = "manifest_path")]
     pub manifest_path: String,
     pub normal: Option<Vec<String>>,
-    pub development: Option<Vec<Value>>,
+    pub development: Option<Vec<String>>,
     pub build: Option<Vec<String>>,
+}
+
+pub fn pretty_print_notes(_args: Option<Values>) {
+    let false_positive_note = format!(
+        r#"
+{}: There might be false positives.
+      For example, `{}` cannot detect crates only used in doc-tests.
+      To ignore dependencies, write `{}` in {}."#,
+        "Note".bright_blue(),
+        "fleet udeps".bright_cyan(),
+        "package.metadata.cargo-udeps.ignore".bright_green(),
+        "Cargo.toml".bright_yellow(),
+    );
+
+    println!("{false_positive_note}");
+
+    let all_targets_note = format!(
+        r#"
+{}: These dependencies might be used by other targets.
+      To find dependencies that are not used by any target, enable `{}`."#,
+        "Note".bright_blue(),
+        "--all-targets".bright_cyan(),
+    );
+
+    println!("{all_targets_note}");
+}
+
+pub fn pretty_print_udeps_analysis(analysis: UdepsAnalysis) {
+    if let Some(unused_deps) = analysis.unused_deps {
+        for (crate_name, dependencies) in unused_deps.iter() {
+            let split = crate_name.split(' ').collect::<Vec<&str>>();
+
+            let name = split[0].trim();
+            let version = split[1].trim();
+
+            let mut unused_dependencies_found = false;
+
+            if let Some(normal) = &dependencies.normal {
+                if !normal.is_empty() {
+                    unused_dependencies_found = true;
+                }
+            }
+
+            if let Some(development) = &dependencies.development {
+                if !development.is_empty() {
+                    unused_dependencies_found = true;
+                }
+            }
+
+            if let Some(build) = &dependencies.build {
+                if !build.is_empty() {
+                    unused_dependencies_found = true;
+                }
+            }
+
+            if unused_dependencies_found {
+                let mut tree = TreeBuilder::new(format!(
+                    "unused deps for {}{}{}",
+                    name.bright_yellow(),
+                    "@".bright_magenta(),
+                    version.bright_black()
+                ));
+
+                if let Some(normal) = &dependencies.normal {
+                    if !normal.is_empty() {
+                        tree.begin_child("dependencies".bright_green().to_string());
+                        for unused_dependency in normal {
+                            tree.add_empty_child(unused_dependency.to_string());
+                        }
+                        tree.end_child();
+                    }
+                }
+
+                if let Some(development) = &dependencies.development {
+                    if !development.is_empty() {
+                        tree.begin_child("dev-dependencies".bright_blue().to_string());
+                        for unused_dependency in development {
+                            tree.add_empty_child(unused_dependency.to_string());
+                        }
+                        tree.end_child();
+                    }
+                }
+
+                if let Some(build) = &dependencies.build {
+                    if !build.is_empty() {
+                        tree.begin_child("build-dependencies".bright_cyan().to_string());
+                        for unused_dependency in build {
+                            tree.add_empty_child(unused_dependency.to_string());
+                        }
+                        tree.end_child();
+                    }
+                }
+
+                let mut print_config = PrintConfig::default();
+                let mut style = Style::default();
+                style.foreground = Some(Color::RGB(128, 128, 128));
+
+                print_config.branch = style;
+
+                print_tree_with(&tree.build(), &print_config).unwrap();
+            } else {
+                continue;
+            }
+        }
+
+        pretty_print_notes(None);
+    }
 }
 
 /// Panics:
@@ -57,7 +168,7 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
 
     spinner.set_style(ProgressStyle::default_spinner().template("{spinner} {msg}"));
 
-    spinner.set_message("Initializing".bright_green().to_string());
+    spinner.set_message("Analysing".bright_green().to_string());
 
     spinner.enable_steady_tick(10);
 
@@ -149,9 +260,9 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
 
     let data = serde_json::from_str::<UdepsAnalysis>(&stdout_contents.trim()).unwrap();
 
-    spinner.finish();
+    spinner.finish_and_clear();
 
-    
+    pretty_print_udeps_analysis(data);
 
     Ok(())
 }
