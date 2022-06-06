@@ -1,3 +1,20 @@
+/*
+ *
+ *    Copyright 2021 Fleet Contributors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 use crate::cli::app::App;
 use anyhow::Result;
 use cargo_util::ProcessBuilder;
@@ -22,9 +39,12 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
     let mut warning_count: u64 = 0;
     let mut error_count: u64 = 0;
 
+    let mut stdout_contents: String = String::new();
+
     let output = command.exec_with_streaming(
         &mut |on_stdout| {
             // spinner.println(format!("Stdout: {}", on_stdout));
+            stdout_contents.push_str(&on_stdout);
             Ok(())
         },
         &mut |on_stderr| {
@@ -102,13 +122,9 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
 
     spinner.set_message("Analysing".bright_cyan().to_string());
 
+    let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout_contents.trim()).unwrap();
+
     spinner.finish();
-
-    // let stdout = String::from_utf8(output.unwrap().err).unwrap();
-
-    // println!("{}", stdout);
-
-    // let data = serde_json::from_str::<BloatCrateAnalysis>(&stdout).unwrap();
 
     Ok(())
 }
