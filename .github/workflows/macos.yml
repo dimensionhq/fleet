@@ -27,9 +27,8 @@ jobs:
       - name: Cache .cargo/bin
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-modules
+          cache-name: cache-cargo-dir
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: /Users/runner/.cargo/bin/
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/cargo.lock') }}
           restore-keys: |
