@@ -46,6 +46,9 @@ jobs:
         run: cargo install --path . fleet-rs -f
 
 
+      - name: Run app using fleet
+        run: fleet build -- --bin fleet
+    
       - name: Install cargo bloat
         run: cargo install cargo-bloat
 
