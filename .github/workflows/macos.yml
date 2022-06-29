@@ -45,12 +45,11 @@ jobs:
       - name: Install fleet
         run: cargo install --path . fleet-rs -f
 
-
       - name: Run app using fleet
         run: fleet build -- --bin fleet
     
       - name: Install cargo bloat
-        run: cargo install cargo-bloat
+        run: if [ -e ~/.cargo/bin/cargo-bloat ] ; then echo "Bloat is already installed"; else cargo install cargo-bloat -f; fi
 
       - name: Run bloat analysis
         run: fleet bloat
