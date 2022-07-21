@@ -58,7 +58,7 @@ pub struct BloatFunctionAnalysis {
 #[serde(rename_all = "camelCase")]
 pub struct Function {
     #[serde(rename = "crate")]
-    pub crate_field: String,
+    pub crate_field: Option<String>,
     pub name: String,
     pub size: i64,
 }
@@ -95,6 +95,24 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
 
                     if !contents.is_empty() {
                         let chunks: Vec<&str> = contents.split(' ').collect();
+
+                        if contents.starts_with("Downloaded") {
+                            let name = chunks[1].to_string();
+
+                            let mut version = chunks[2].to_string();
+
+                            if version.starts_with('v') {
+                                version.remove(0);
+                            }
+
+                            spinner.set_message(format!(
+                                "{} ({}{}{})",
+                                "Download".bright_cyan(),
+                                name.bright_yellow(),
+                                "@".bright_magenta(),
+                                version.bright_black(),
+                            ));
+                        }
 
                         if contents.starts_with("Compiling") {
                             let name = chunks[1].to_string();
@@ -205,9 +223,14 @@ pub fn run(_app: App, _args: Option<Values>) -> Result<()> {
         for function in &data.functions {
             let size = byte_unit::Byte::from_bytes(function.size as u128);
             let adjusted_size = size.get_appropriate_unit(true);
+            let mut crate_field = "unknown";
+
+            if function.crate_field.is_some() {
+                crate_field = &function.crate_field.as_ref().unwrap();
+            }
 
             function_table.add_row(vec![
-                Cell::new(function.crate_field.to_string()).fg(Color::Blue),
+                Cell::new(crate_field.to_string()).fg(Color::Blue),
                 Cell::new(function.name.to_string()),
                 Cell::new(adjusted_size.to_string()).fg(Color::Cyan),
             ]);

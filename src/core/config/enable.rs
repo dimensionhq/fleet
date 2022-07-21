@@ -28,6 +28,7 @@ fn string_path_unwrap(path: Option<PathBuf>) -> Option<String> {
 }
 
 #[cfg(unix)]
+#[allow(unused_imports)]
 use sysinfo::{DiskExt, DiskType, RefreshKind, System, SystemExt};
 
 /// If the `./.cargo/config.toml` doesn't exist, it is created.
