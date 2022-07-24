@@ -38,15 +38,6 @@ cargo install --git https://github.com/dimensionhq/fleet fleet-rs
 
 Fleet works by optimizing your builds using existing tooling available in the Rust ecosystem, including seamlessly integrating sccache, lld, zld, ramdisks (for those using WSL or HDD's) et al.
 
-
-
-## :clap: Supporters
-[![Stargazers repo roster for @dimensionhq/fleet](https://reporoster.com/stars/dimensionhq/fleet)](https://github.com/dimensionhq/fleet/stargazers)
-
-[![Forkers repo roster for @dimensionhq/fleet](https://reporoster.com/forks/dimensionhq/fleet)](https://github.com/dimensionhq/fleet/network/members)
-
-<br>
-
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dimensionhq/fleet/tags). 
