@@ -11,7 +11,6 @@
 
 **Note**: Since fleet is in the beta phase, it might not be completely stable yet. Feel free to open any issues or bug reports at [issues](https://github.com/dimensionhq/fleet/issues/).
 
-**Note**: As of now fleet only supports `rustc` nightly
 <br>
 
 # :zap: Installation
