@@ -7,9 +7,9 @@
 <br>
 
 
-[Fleet](https://fleet.rs) is the blazing fast build tool for Rust. Compiling with Fleet is up-to 5x faster than with `cargo`.
+[Fleet](https://fleet.rs) is a blazingly fast build tool for Rust. Compiling with Fleet is up to 5x faster than with `cargo`.
 
-**Note**: Since fleet is in the beta phase, it might not be completely stable yet. Feel free to open any issues or bug reports at [issues](https://github.com/dimensionhq/fleet/issues/).
+**Note**: Since Fleet is in its beta phase, it might not be completely stable yet. Feel free to open any issues or bug reports at [issues](https://github.com/dimensionhq/fleet/issues/).
 
 <br>
 
@@ -33,9 +33,9 @@ cargo install --git https://github.com/dimensionhq/fleet fleet-rs
 ```
 
 
-## How does fleet work?
+## How does Fleet work?
 
-Fleet works by optimizing your builds using existing tooling available in the Rust ecosystem, including seamlessly integrating sccache, lld, zld, ramdisks (for those using WSL or HDD's) et al.
+Fleet works by optimizing your builds using existing tooling available in the Rust ecosystem, including seamlessly integrating sccache, lld, zld, ramdisks (for those using WSL or HDD's) and more.
 
 ## Versioning
 
