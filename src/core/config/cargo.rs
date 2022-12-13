@@ -37,8 +37,6 @@ pub struct ProfileValues {
     pub incremental: bool,
     #[serde(rename = "codegen-units")]
     pub codegen_units: u16,
-    #[serde(rename = "split-debuginfo")]
-    pub split: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -110,8 +108,6 @@ pub fn add_rustc_wrapper_and_target_configs(
         },
         profile: Profile {
             release: ProfileValues {
-                split: Some(String::from("...")),
-
                 opt_level: 3,
                 debug: 0,
                 incremental: false,
@@ -120,7 +116,6 @@ pub fn add_rustc_wrapper_and_target_configs(
             dev: ProfileValues {
                 codegen_units: 512,
                 debug: 2,
-                split: None,
                 incremental: true,
                 opt_level: 0,
             },
