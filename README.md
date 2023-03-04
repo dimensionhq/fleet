@@ -9,7 +9,7 @@
 
 [Fleet](https://fleet.rs) is the blazing fast build tool for Rust. Compiling with Fleet is up-to 5x faster than with `cargo`.
 
-**Note**: Since fleet is in the beta phase, it might not be completely stable yet. Feel free to open any issues or bug reports at [issues](https://github.com/dimensionhq/fleet/issues/).
+**Note**: Since Fleet is still under development, it might not be completely stable yet. Feel free to open any issues or bug reports at [issues](https://github.com/dimensionhq/fleet/issues/).
 
 <br>
 
