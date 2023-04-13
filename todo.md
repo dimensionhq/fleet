@@ -1,4 +1,4 @@
-# Integrations
+# Planned Integrations
 
 Integrate:
 > cargo-make
